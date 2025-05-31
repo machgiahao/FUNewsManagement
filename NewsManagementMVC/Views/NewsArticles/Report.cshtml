@@ -1,0 +1,45 @@
+﻿@model List<FUNewsManagementSystem.BusinessObject.NewsArticle>
+@{
+    ViewData["Title"] = "News Report";
+}
+
+<h2>News Report</h2>
+
+<form method="get">
+    <label>Start Date: 
+        <input type="date" name="startDate" 
+               value="@(ViewData["StartDate"] is DateTime start ? start.ToString("yyyy-MM-dd") : "")" />
+    </label>
+    <label>End Date: 
+        <input type="date" name="endDate" 
+               value="@(ViewData["EndDate"] is DateTime end ? end.ToString("yyyy-MM-dd") : "")" />
+    </label>
+    <button type="submit">Generate Report</button>
+</form>
+
+@if (Model != null && Model.Count > 0)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Created Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.NewsTitle</td>
+                <td>@item.CreatedDate?.ToString("yyyy-MM-dd")</td>
+                <td>@(item.NewsStatus == true ? "Active" : "Inactive")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No data found for the selected period.</p>
+}

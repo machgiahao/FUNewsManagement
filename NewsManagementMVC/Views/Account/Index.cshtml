@@ -1,0 +1,66 @@
+﻿@model IEnumerable<AccountViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#createModal">Create New</a>
+    @await Html.PartialAsync("_CreateModal", new CreateAccountViewModel())
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.AccountName)</th>
+            <th>@Html.DisplayNameFor(model => model.AccountEmail)</th>
+            <th>@Html.DisplayNameFor(model => model.AccountRole)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.AccountName)</td>
+                <td>@Html.DisplayFor(modelItem => item.AccountEmail)</td>
+                <td>
+                    @{
+                        string roleDisplay = item.AccountRole switch
+                        {
+                            1 => "Staff",
+                            2 => "Lecturer",
+                            _ => "Unknown"
+                        };
+                    }
+                    @roleDisplay
+                <td>
+                    <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-@item.AccountId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.AccountId">Details</a> |
+                    <button type="button" class="btn btn-link text-danger p-0" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.AccountId">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+
+            @* Edit Modal *@
+            @await Html.PartialAsync("_EditModal", item, new ViewDataDictionary(ViewData)
+            {
+                { "Id", $"editModal-{item.AccountId}" }
+            })
+
+            @* Delete Modal *@
+            @await Html.PartialAsync("_DeleteModal", item.AccountId.ToString(), new ViewDataDictionary(ViewData)
+            {
+                { "Name", item.AccountName }
+            })
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,180 @@
+﻿@using NewsManagementMVC.Models.ViewModels.Auth
+@model LoginViewModel
+
+@{
+    Layout = "_LayoutMinimal";
+}
+
+<style>
+    html, body {
+        height: 100%;
+        background: #fafbfc;
+    }
+
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        background: #fafbfc;
+    }
+
+    .login-box {
+        width: 370px;
+        background: #fff;
+        margin-top: 7vh; /* lift the form up */
+        padding-right: 2vw;
+        padding-left: 1vw;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px 0 rgba(60,60,60,0.12), 0 1.5px 6px 0 rgba(60,60,60,0.08);
+        transition: box-shadow 0.2s;
+    }
+
+    .login-title {
+        font-weight: 500;
+        font-size: 2rem;
+        text-align: center;
+        margin-bottom: 36px;
+        margin-top: 32px;
+        color: #4a4a4a;
+    }
+
+    .input-group {
+        margin-bottom: 22px;
+    }
+
+    .input-group-text {
+        background: #fff;
+        border: none;
+        color: linear-gradient(90deg, #ff9800 0%, #ff5722 100%);
+        font-size: 1.3rem;
+        padding-left: 0;
+        padding-right: 8px;
+        min-width: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .form-control {
+        border-radius: 10px !important;
+        border: 2px solid #e0e0e0;
+        min-height: 48px;
+        font-size: 1rem;
+        box-shadow: none;
+        background: #fff;
+    }
+
+    .form-control::placeholder {
+        color: #b0b8c1;
+        opacity: 1;
+    }
+
+    .form-control:focus {
+        border-color: #ffa726;
+        box-shadow: 0 0 0 2px #ffe0b2;
+    }
+
+    .remember-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        padding-left: 2px;
+        padding-right: 2px;
+    }
+
+    .form-check-label {
+        color: #b0b8c1;
+        font-size: 1rem;
+        margin-left: 4px;
+        font-weight: 400;
+    }
+
+    .forgot-link {
+        color: #b0b8c1;
+        font-size: 1rem;
+        font-style: italic;
+        text-decoration: none;
+        transition: color 0.2s;
+        font-weight: 400;
+    }
+
+    .forgot-link:hover {
+        color: #ffa726;
+    }
+
+    .btn-login {
+        width: 220px;
+        background: linear-gradient(90deg, #ff9800 0%, #ff5722 100%);
+        color: #fff;
+        border: none;
+        border-radius: 999px; /* fully rounded */
+        font-weight: 600;
+        font-size: 1.15rem;
+        padding: 12px 0;
+        letter-spacing: 1px;
+        transition: background 0.2s, box-shadow 0.2s;
+        margin: 0 auto 36px auto;
+        display: block;
+        box-shadow: 0 2px 8px 0 rgba(255,167,38,0.10);
+    }
+
+    .btn-login:hover {
+        background: linear-gradient(90deg, #ff5722 0%, #ff9800 100%);
+        color: #fff;
+        box-shadow: 0 4px 16px 0 rgba(255,167,38,0.18);
+    }
+
+    .input-validation-align {
+        margin-left: 46px;
+        display: block;
+    }
+
+</style>
+
+<div class="login-container">
+    <div class="login-box">
+        <div class="login-title mb-1">Login</div>
+        @if (ViewData.ModelState.ContainsKey("LOGIN_FAIL") && ViewData.ModelState["LOGIN_FAIL"].Errors.Count > 0)
+        {
+            <div class="text-danger" style="text-align:center;">
+                @ViewData.ModelState["LOGIN_FAIL"].Errors[0].ErrorMessage
+            </div>
+        }
+        <form asp-action="Login" method="post" asp-controller="Auth" autocomplete="off">
+            <div class="input-group" style="flex-direction: column; align-items: flex-start;">
+                <span asp-validation-for="AccountEmail" class="text-danger mb-1 input-validation-align"></span>
+                <div style="display: flex; width: 100%;">
+                    <span class="input-group-text" style="margin-right: 8px;">
+                        <!-- SVG icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
+                            <path fill="#ffa726" d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4Zm0-2a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z" />
+                        </svg>
+                    </span>
+                    <input asp-for="AccountEmail" class="form-control" placeholder="Email" />
+                </div>
+            </div>
+            <div class="input-group" style="flex-direction: column; align-items: flex-start;">
+                <span asp-validation-for="AccountPassword" class="text-danger mb-1 input-validation-align"></span>
+                <div style="display: flex; width: 100%;">
+                    <span class="input-group-text" style="margin-right: 8px;">
+                        <!-- SVG icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
+                            <path fill="#ffa726" d="M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm6-7V8a6 6 0 1 0-12 0v2a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2Zm-8-2a4 4 0 1 1 8 0v2H8V8Zm10 10H6v-6h12v6Z" />
+                        </svg>
+                    </span>
+                    <input asp-for="AccountPassword" class="form-control" type="password" placeholder="Password" />
+                </div>
+            </div>
+            <div class="remember-row">
+                <div>
+                    <input type="checkbox" class="form-check-input" id="rememberMe" />
+                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                </div>
+                <label class="form-check-label">No account?<a href="/Auth/AuthRegister" class="forgot-link text-primary">Sign up</a></label>
+            </div>
+            <button type="submit" class="btn btn-login">LOGIN</button>
+        </form>
+    </div>
+</div>

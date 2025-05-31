@@ -1,0 +1,20 @@
+﻿@model object
+
+@{
+    string id = ViewData["Id"]?.ToString() ?? "editModal";
+    string label = $"{id}Label";
+}
+
+<div class="modal fade" id="@id" tabindex="-1" aria-labelledby="@label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="@label">Edit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("Edit", Model)
+            </div>
+        </div>
+    </div>
+</div>
