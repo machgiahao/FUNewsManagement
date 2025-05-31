@@ -1,81 +1,101 @@
-﻿@model FUNewsManagementSystem.BusinessObject.NewsArticle
+﻿@model CreateNewsArticleViewModel
 
-@{
-    ViewData["Title"] = "Create";
-}
+<style>
+    .dropdown-menu {
+        padding: 0.5rem 1rem;
+    }
 
-<h1>Create</h1>
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+    }
 
-<h4>NewsArticle</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="NewsArticleId" class="control-label"></label>
-                <input asp-for="NewsArticleId" class="form-control" />
-                <span asp-validation-for="NewsArticleId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NewsTitle" class="control-label"></label>
-                <input asp-for="NewsTitle" class="form-control" />
-                <span asp-validation-for="NewsTitle" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Headline" class="control-label"></label>
-                <input asp-for="Headline" class="form-control" />
-                <span asp-validation-for="Headline" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedDate" class="control-label"></label>
-                <input asp-for="CreatedDate" class="form-control" />
-                <span asp-validation-for="CreatedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NewsContent" class="control-label"></label>
-                <input asp-for="NewsContent" class="form-control" />
-                <span asp-validation-for="NewsContent" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="NewsSource" class="control-label"></label>
-                <input asp-for="NewsSource" class="form-control" />
-                <span asp-validation-for="NewsSource" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="NewsStatus" class="control-label"></label>
-                <input asp-for="NewsStatus" class="form-control" />
-                <span asp-validation-for="NewsStatus" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedById" class="control-label"></label>
-                <select asp-for="CreatedById" class ="form-control" asp-items="ViewBag.CreatedById"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="UpdatedById" class="control-label"></label>
-                <input asp-for="UpdatedById" class="form-control" />
-                <span asp-validation-for="UpdatedById" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ModifiedDate" class="control-label"></label>
-                <input asp-for="ModifiedDate" class="form-control" />
-                <span asp-validation-for="ModifiedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+    .dropdown-item input[type="checkbox"] {
+        margin-right: 0.5rem;
+    }
+</style>
+
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="NewsTitle"></label>
+        <input asp-for="NewsTitle" class="form-control" />
+        <span asp-validation-for="NewsTitle" class="text-danger"></span>
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="form-group">
+        <label asp-for="Headline"></label>
+        <input asp-for="Headline" class="form-control" />
+        <span asp-validation-for="Headline" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="NewsContent"></label>
+        <textarea asp-for="NewsContent" class="form-control"></textarea>
+        <span asp-validation-for="NewsContent" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="NewsSource"></label>
+        <input asp-for="NewsSource" class="form-control" />
+        <span asp-validation-for="NewsSource" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CategoryId"></label>
+        <select asp-for="CategoryId" asp-items="@(ViewData["CategoryId"] as SelectList)" class="form-control">
+            <option value="">-- Select Category --</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="SelectedTagIds"></label>
+        <div class="border rounded p-2" style="max-height: 250px; overflow-y: auto;">
+            <div class="form-check mb-1">
+                <input type="checkbox" class="form-check-input" id="selectAllTags" />
+                <label class="form-check-label" for="selectAllTags"><b>Select All</b></label>
+            </div>
+            @foreach (var tag in (ViewData["TagIds"] as MultiSelectList))
+            {
+                <div class="form-check mb-1">
+                    <input type="checkbox" class="form-check-input tag-checkbox" name="SelectedTagIds" value="@tag.Value" id="tag_@tag.Value" />
+                    <label class="form-check-label" for="tag_@tag.Value">@tag.Text</label>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="NewsStatus" class="control-label"></label>
+        <select asp-for="NewsStatus" class="form-select">
+            <option value="">-- Select Role --</option>
+            <option value="false">Inactive</option>
+            <option value="true">Active</option>
+        </select>
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Toggle "Select All"
+        $('#selectAllTags').on('change', function () {
+            $('.tag-checkbox').prop('checked', this.checked);
+        });
+
+        // If any checkbox is unchecked, uncheck "Select All"
+        $('.tag-checkbox').on('change', function () {
+            if (!this.checked) {
+                $('#selectAllTags').prop('checked', false);
+            } else if ($('.tag-checkbox:checked').length === $('.tag-checkbox').length) {
+                $('#selectAllTags').prop('checked', true);
+            }
+        });
+    </script>
 }
+
+

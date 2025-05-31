@@ -29,7 +29,7 @@ namespace NewsManagementMVC.Controllers
                 var user = _accountService.Login(model.AccountEmail, model.AccountPassword);
                 if (user != null)
                 {
-                    HttpContext.Session.SetString("UserId", user.AccountId.ToString());
+                    HttpContext.Session.SetInt32("UserId", user.AccountId);
                     HttpContext.Session.SetString("Username", user.AccountName);
 
                     HttpContext.Session.SetInt32("Role", user.AccountRole ?? -1);
