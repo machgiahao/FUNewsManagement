@@ -58,6 +58,63 @@
     </div>
 </div>
 
+<!-- Modal: Change Password -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="ChangePassword" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    @if (TempData["PasswordError"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["PasswordError"]</div>
+                    }
+                    @if (TempData["PasswordSuccess"] != null)
+                    {
+                        <div class="alert alert-success">@TempData["PasswordSuccess"]</div>
+                    }
+
+                    <div class="mb-3">
+                        <label for="CurrentPassword" class="form-label">Current Password</label>
+                        <input type="password" name="CurrentPassword" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="NewPassword" class="form-label">New Password</label>
+                        <input type="password" name="NewPassword" class="form-control" required minlength="6" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ConfirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" name="ConfirmPassword" class="form-control" required minlength="6" />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $(document).ready(function () {
+            var hasPasswordError = '@TempData["PasswordError"]' !== '';
+            var hasPasswordSuccess = '@TempData["PasswordSuccess"]' !== '';
+
+            if (hasPasswordError || hasPasswordSuccess) {
+                var modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+                modal.show();
+            }
+        });
+    </script>
 }

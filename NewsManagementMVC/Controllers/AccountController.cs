@@ -244,6 +244,57 @@ namespace NewsManagementMVC.Controllers
             return RedirectToAction("Profile");
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ChangePassword(string CurrentPassword, string NewPassword, string ConfirmPassword)
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            var account = _accountService.GetCurrentAccount(int.Parse(userId ?? "0"));
+            if (account == null)
+            {
+                TempData["PasswordError"] = "Account not found.";
+                return RedirectToAction("Profile");
+            }
+
+            if (string.IsNullOrWhiteSpace(CurrentPassword) || string.IsNullOrWhiteSpace(NewPassword) || string.IsNullOrWhiteSpace(ConfirmPassword))
+            {
+                TempData["PasswordError"] = "All fields are required.";
+                return RedirectToAction("Profile");
+            }
+
+            if (!account.AccountPassword.Equals(CurrentPassword))
+            {
+                TempData["PasswordError"] = "Current password is incorrect.";
+                return RedirectToAction("Profile");
+            }
+
+            if (NewPassword.Length < 6)
+            {
+                TempData["PasswordError"] = "New password must be at least 6 characters.";
+                return RedirectToAction("Profile");
+            }
+
+            if (!NewPassword.Equals(ConfirmPassword))
+            {
+                TempData["PasswordError"] = "New password and confirmation do not match.";
+                return RedirectToAction("Profile");
+            }
+
+            try
+            {
+                account.AccountPassword = NewPassword;
+                _accountService.UpdateSystemAccount(account);
+
+                TempData["PasswordSuccess"] = "Password changed successfully.";
+            }
+            catch (Exception ex)
+            {
+                TempData["PasswordError"] = "Error changing password: " + ex.Message;
+            }
+
+            return RedirectToAction("Profile");
+        }
+
     }
 }
 
