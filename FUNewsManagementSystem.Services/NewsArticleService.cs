@@ -53,5 +53,14 @@ namespace FUNewsManagementSystem.Services
             return _iNewsArticleRepository.GetNewsArticlesByPeriod(startDate, endDate);
         }
 
+        public List<NewsArticle> GetListNewsArticlesByCreator(int creatorId)
+        {
+            return _iNewsArticleRepository.GetListNewsArticlesByCreator(creatorId);
+        }
+
+        public NewsArticle GetDetailNewsArticleById(string newArticleId)
+        {
+            return _iNewsArticleRepository.GetDetailNewsArticleById(newArticleId);
+        }
     }
 }

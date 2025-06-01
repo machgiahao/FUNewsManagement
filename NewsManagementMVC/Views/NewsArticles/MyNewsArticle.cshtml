@@ -1,0 +1,32 @@
+﻿@using System.Text.Json
+@model List<NewsArticleSummaryViewModel>
+
+<h2>My News Article</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Created Date</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Modified Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.NewsTitle</td>
+                <td>@item.CreatedDate?.ToString("yyyy-MM-dd")</td>
+                <td>@item.CategoryName</td>
+                <td>@(item.NewsStatus == true ? "Active" : "Inactive")</td>
+                <td>@item.ModifiedDate?.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <a asp-action="Detail" asp-route-id="@item.NewsArticleId" class="btn btn-sm btn-primary">Detail</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+    

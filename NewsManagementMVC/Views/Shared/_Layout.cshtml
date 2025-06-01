@@ -1,6 +1,8 @@
 ﻿@{
     var isLoggedIn = Context.Session.GetString("Username") != null;
     var username = Context.Session.GetString("Username");
+    var role = Context.Session.GetInt32("Role");
+    var isStaff = role == 1;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -47,6 +49,10 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="userMenuDropdown">
                                 <li><a class="dropdown-item" href="/Account/Profile">Profile</a></li>
+                                @if (isStaff)
+                                {
+                                    <li><a class="dropdown-item" href="/NewsArticles/MyNewsArticle">My News Article</a></li>
+                                }
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item text-danger" href="/Auth/Logout">Logout</a></li>
                             </ul>

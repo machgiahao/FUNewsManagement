@@ -104,6 +104,26 @@ namespace FUNewsManagementSystem.DataAccess
                 throw new Exception("Error in GetNewsArticlesByPeriod: " + ex.Message);
             }
         }
+
+        public List<NewsArticle> GetListNewsArticlesByCreator(int creatorId)
+        {
+            using var context = new FunewsManagementContext();
+            return context.NewsArticles
+                .Include(n => n.Category)
+                .Where(n => n.CreatedById == creatorId)
+                .ToList();
+        }
+
+        public NewsArticle GetDetailNewsArticleById(string newsArticleId)
+        {
+            using var context = new FunewsManagementContext();
+            return context.NewsArticles
+                .Include(n => n.Category)
+                .Include(n => n.Tags)
+                .Include(n => n.CreatedBy)
+                .Include(n => n.UpdatedBy)
+                .FirstOrDefault(n => n.NewsArticleId == newsArticleId);
+        }
     }
 }
  

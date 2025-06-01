@@ -35,7 +35,7 @@ namespace NewsManagementMVC.Controllers
             {
                 return View(listNewsArticles.ToList());
             }
-            var activeNewsArticles =  listNewsArticles.Where(n => n.NewsStatus == true)
+            var activeNewsArticles = listNewsArticles.Where(n => n.NewsStatus == true)
                                                       .OrderByDescending(n => n.CreatedDate)
                                                       .ToList(); ;
             return View(activeNewsArticles);
@@ -71,7 +71,7 @@ namespace NewsManagementMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        
+
         public async Task<IActionResult> Create(CreateNewsArticleViewModel model)
         {
             if (ModelState.IsValid)
@@ -94,7 +94,7 @@ namespace NewsManagementMVC.Controllers
                 return NotFound();
             }
 
-            var newsArticle =  _contextNewsArticle.GetNewsArticleById(id);
+            var newsArticle = _contextNewsArticle.GetNewsArticleById(id);
             if (newsArticle == null)
             {
                 return NotFound();
@@ -193,5 +193,58 @@ namespace NewsManagementMVC.Controllers
             return View(reportData);
         }
 
+        public IActionResult MyNewsArticle()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var newsListEntities = _contextNewsArticle.GetListNewsArticlesByCreator(userId.Value);
+
+            var newsListViewModels = newsListEntities.Select(n => new NewsArticleSummaryViewModel
+            {
+                NewsArticleId = n.NewsArticleId,
+                NewsTitle = n.NewsTitle,
+                CreatedDate = n.CreatedDate,
+                CategoryName = n.Category?.CategoryName,
+                NewsStatus = n.NewsStatus,
+                ModifiedDate = n.ModifiedDate
+            }).ToList();
+
+            return View(newsListViewModels);
+        }
+
+        public IActionResult Detail(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+            {
+                return BadRequest();
+            }
+
+            var newsArticle = _contextNewsArticle.GetDetailNewsArticleById(id);
+            if (newsArticle == null)
+            {
+                return NotFound();
+            }
+
+            var viewModel = new NewsArticleDetailViewModel
+            {
+                NewsTitle = newsArticle.NewsTitle,
+                Headline = newsArticle.Headline,
+                CreatedDate = newsArticle.CreatedDate,
+                NewsContent = newsArticle.NewsContent,
+                NewsSource = newsArticle.NewsSource,
+                CategoryName = newsArticle.Category?.CategoryName,
+                NewsStatus = newsArticle.NewsStatus,
+                CreatedName = newsArticle.CreatedBy?.AccountName ?? "Unknown",
+                UpdatedName = newsArticle.UpdatedBy?.AccountName ?? "Unknown",
+                ModifiedDate = newsArticle.ModifiedDate,
+                TagNames = newsArticle.Tags?.Select(t => t.TagName).ToList() ?? new List<string>()
+            };
+
+            return View("MyDetailNewsArticle", viewModel);
+        }
     }
 }
