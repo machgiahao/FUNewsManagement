@@ -77,6 +77,11 @@ namespace NewsManagementMVC.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
 
     }
 }

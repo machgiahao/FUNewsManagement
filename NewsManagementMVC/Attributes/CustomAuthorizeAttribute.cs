@@ -16,7 +16,6 @@ namespace NewsManagementMVC.Attributes
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var role = context.HttpContext.Session.GetInt32("Role");
-            Console.Write($"Role {role}");
             if(role == null)
             {
                 Console.Write($"Role null");
