@@ -55,6 +55,13 @@ namespace FUNewsManagementSystem.Services
 
         public void UpdateSystemAccount(SystemAccount systemAccount) => _iAccountRepository.UpdateSystemAccount(systemAccount);
         public SystemAccount GetAccountById(int id) => _iAccountRepository.GetAccountById(id);
+
+        public SystemAccount GetCurrentAccount(int id) => _iAccountRepository.GetAccountById(id);
+
+        public List<string> GetAllAccountEmails() =>_iAccountRepository.GetAllAccounts()
+                                                                       .Where(a => !string.IsNullOrWhiteSpace(a.AccountEmail))
+                                                                       .Select(a => a.AccountEmail.ToLower())
+                                                                       .ToList();
     }
-    
+
 }

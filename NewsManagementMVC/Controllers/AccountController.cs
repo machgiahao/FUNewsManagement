@@ -164,7 +164,86 @@ namespace NewsManagementMVC.Controllers
             var model = AccountViewModel.FromSystemAccount(account);
             return (account == null) ? false : true;
         }
-    }
 
+        public IActionResult Profile()
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            var account = _accountService.GetCurrentAccount(int.Parse(userId ?? "0"));
+            if (account == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var viewModel = AccountViewModel.FromSystemAccount(account);
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateProfile(AccountViewModel model)
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            var account = _accountService.GetCurrentAccount(int.Parse(userId ?? "0"));
+            if (account == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            // Not Uptdate
+            bool isNameChanged = !string.Equals(model.AccountName?.Trim(), account.AccountName, StringComparison.Ordinal);
+            bool isEmailChanged = !string.Equals(model.AccountEmail?.Trim(), account.AccountEmail, StringComparison.OrdinalIgnoreCase);
+
+            if (!isNameChanged && !isEmailChanged)
+            {
+                TempData["InfoMessage"] = "You have already updated your profile. No changes detected.";
+                return RedirectToAction("Profile");
+            }
+
+            // Update ==> Validate
+            if (string.IsNullOrWhiteSpace(model.AccountName) || model.AccountName.Trim().Length <= 2)
+            {
+                ModelState.AddModelError(nameof(model.AccountName), "Name must be longer than 2 characters.");
+            }
+
+            if (string.IsNullOrWhiteSpace(model.AccountEmail) || !model.AccountEmail.Contains("@"))
+            {
+                ModelState.AddModelError(nameof(model.AccountEmail), "Email must contain '@'.");
+            }
+            else
+            {
+                // Check mail existed
+                var allEmails = _accountService.GetAllAccountEmails()
+                                               .Where(e => !e.Equals(account.AccountEmail, StringComparison.OrdinalIgnoreCase))
+                                               .ToList();
+
+                if (allEmails.Contains(model.AccountEmail.Trim(), StringComparer.OrdinalIgnoreCase))
+                {
+                    ModelState.AddModelError(nameof(model.AccountEmail), "Email is already in use.");
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("Profile", model);
+            }
+
+            account.AccountName = model.AccountName.Trim();
+            account.AccountEmail = model.AccountEmail.Trim();
+
+            try
+            {
+                _accountService.UpdateSystemAccount(account);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Error updating profile: " + ex.Message);
+                return View("Profile", model);
+            }
+
+            TempData["SuccessMessage"] = "Profile updated successfully.";
+            return RedirectToAction("Profile");
+        }
+
+    }
 }
 

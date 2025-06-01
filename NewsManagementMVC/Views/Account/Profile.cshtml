@@ -1,0 +1,63 @@
+﻿@model NewsManagementMVC.Models.ViewModels.Account.AccountViewModel
+
+@{
+    ViewData["Title"] = "Your Profile";
+}
+
+<h2 class="text-center mt-4 mb-4">Your Profile</h2>
+
+<div class="d-flex justify-content-center">
+    <div class="w-50">
+
+        @* Hiển thị thông báo thành công hoặc lỗi *@
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        }
+        @if (TempData["InfoMessage"] != null)
+        {
+            <div class="alert alert-info">@TempData["InfoMessage"]</div>
+        }
+
+        <form asp-action="UpdateProfile" method="post">
+            <input type="hidden" asp-for="AccountId" />
+
+            <div class="form-group mb-3">
+                <label for="AccountName" class="form-label">Account Name</label>
+                <input asp-for="AccountName" class="form-control" />
+                <span asp-validation-for="AccountName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="AccountEmail" class="form-label">Account Email</label>
+                <input asp-for="AccountEmail" class="form-control" />
+                <span asp-validation-for="AccountEmail" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label">Role</label>
+                @{
+                    string roleDisplay = Model.AccountRole switch
+                    {
+                        0 => "Admin",
+                        1 => "Staff",
+                        2 => "Lecturer",
+                        _ => "Unknown"
+                    };
+                }
+                <input class="form-control" value="@roleDisplay" disabled />
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success me-3">Save Changes</button>
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                    Change Password
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
