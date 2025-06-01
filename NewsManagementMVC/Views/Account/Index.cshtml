@@ -1,102 +1,106 @@
 ﻿@model IEnumerable<AccountViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Accounts";
+    var searchField = Context.Request.Query["searchField"].ToString();
+    var searchString = Context.Request.Query["searchString"].ToString();
 }
-<style>
-    .table thead th {
-        background-color: #ddd !important;
-        font-weight: bold;
-    }
 
-    .card {
-        border-radius: 12px;
-        border: 1px solid #e0e0e0;
-    }
-</style>
+<link rel="stylesheet" href="~/css/news-articles.css" />
 
-<h1>Accounts</h1>
+<div class="news-card">
+    <div class="news-header">
+        <h1 class="news-title">Accounts</h1>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#createModal" class="btn btn-success ms-2">+ Create New</a>
+        @await Html.PartialAsync("_CreateModal", new CreateAccountViewModel())
+    </div>
 
-<p>
-    <a href="#" data-bs-toggle="modal" data-bs-target="#createModal">Create New</a>
-    @await Html.PartialAsync("_CreateModal", new CreateAccountViewModel())
-</p>
-
-<form asp-action="Index" method="get" class="mb-4">
-    <div class="card p-3 mb-3" style="background-color: #f8f9fa;">
-        <div class="row g-2 align-items-center">
-            <div class="col-md-3">
-                <select class="form-select" name="searchField">
-                    <option value="AccountName" selected="@(Context.Request.Query["searchField"] == "AccountName" ? "selected" : null)">Account Name</option>
-                    <option value="AccountEmail" selected="@(Context.Request.Query["searchField"] == "AccountEmail" ? "selected" : null)">Email</option>
-                    <option value="AccountRole" selected="@(Context.Request.Query["searchField"] == "AccountRole" ? "selected" : null)">Role</option>
-
-                </select>
-            </div>
-            <div class="col-md-5">
-                    <input type="text" name="searchString" value="@(Context.Request.Query["searchString"])" class="form-control" placeholder="Search" />
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Search</button>
-            </div>
-            <div class="col-md-2">
-                <a href="/Account/Index" class="btn btn-link">Clear all</a>
+    <form asp-action="Index" method="get" class="search-bar">
+        <div>
+            <label for="searchField">Field</label>
+            <select id="searchField" name="searchField" class="form-select" title="Search Field">
+                <option value="AccountName" selected="@(searchField == "AccountName" ? "selected" : null)">Account Name</option>
+                <option value="AccountEmail" selected="@(searchField == "AccountEmail" ? "selected" : null)">Email</option>
+                <option value="AccountRole" selected="@(searchField == "AccountRole" ? "selected" : null)">Role</option>
+            </select>
+        </div>
+        <div>
+            <label for="searchString">Search</label>
+            <div class="search-input-group">
+                <span class="search-icon">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" id="searchString" name="searchString" class="form-control" placeholder="Type to search..." value="@searchString" title="Search" />
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-search"></i> Search
+                </button>
             </div>
         </div>
+        <a href="/Account/Index" class="btn btn-link" style="align-self: end; margin-left: 12px;">Clear all</a>
+    </form>
+
+    <div style="overflow-x:auto;">
+        <table class="news-table">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.AccountName)</th>
+                    <th>@Html.DisplayNameFor(model => model.AccountEmail)</th>
+                    <th>@Html.DisplayNameFor(model => model.AccountRole)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(modelItem => item.AccountName)</td>
+                        <td>
+                            <a href="mailto:@item.AccountEmail" style="color:#1976d2;">@item.AccountEmail</a>
+                        </td>
+                        <td>
+                            @{
+                                string roleDisplay = item.AccountRole switch
+                                {
+                                    1 => "Staff",
+                                    2 => "Lecturer",
+                                    _ => "Unknown"
+                                };
+                                string badgeClass = "badge badge-success";
+                            }
+                            <span class="@badgeClass">@roleDisplay</span>
+                        </td>
+                        <td>
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-@item.AccountId" class="action-btn" title="Edit">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <a asp-action="Details" asp-route-id="@item.AccountId" class="action-btn" title="Details">
+                                <i class="bi bi-info-circle"></i>
+                            </a>
+                            <a href="#" class="action-btn delete" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.AccountId" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+
+                    @* Edit Modal *@
+                    @await Html.PartialAsync("_EditModal", item, new ViewDataDictionary(ViewData)
+                {
+                { "Id", $"editModal-{item.AccountId}" }
+                })
+
+                    @* Delete Modal *@
+                    @await Html.PartialAsync("_DeleteModal", item.AccountId.ToString(), new ViewDataDictionary(ViewData)
+                {
+                { "Name", item.AccountName }
+                })
+                }
+            </tbody>
+        </table>
     </div>
-</form>
-
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.AccountName)</th>
-            <th>@Html.DisplayNameFor(model => model.AccountEmail)</th>
-            <th>@Html.DisplayNameFor(model => model.AccountRole)</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.AccountName)</td>
-                <td>@Html.DisplayFor(modelItem => item.AccountEmail)</td>
-                <td>
-                    @{
-                        string roleDisplay = item.AccountRole switch
-                        {
-                            1 => "Staff",
-                            2 => "Lecturer",
-                            _ => "Unknown"
-                        };
-                    }
-                    @roleDisplay
-                <td>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-@item.AccountId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.AccountId">Details</a> |
-                    <button type="button" class="btn btn-link text-danger p-0" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.AccountId">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-
-            @* Edit Modal *@
-            @await Html.PartialAsync("_EditModal", item, new ViewDataDictionary(ViewData)
-        {
-        { "Id", $"editModal-{item.AccountId}" }
-        })
-
-            @* Delete Modal *@
-            @await Html.PartialAsync("_DeleteModal", item.AccountId.ToString(), new ViewDataDictionary(ViewData)
-        {
-        { "Name", item.AccountName }
-        })
-        }
-    </tbody>
-</table>
+</div>
 
 @section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

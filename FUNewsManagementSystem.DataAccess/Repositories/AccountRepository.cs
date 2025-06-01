@@ -97,5 +97,11 @@ namespace FUNewsManagementSystem.DataAccess
             return (short)((context.SystemAccounts.Any() ? context.SystemAccounts.Max(a => a.AccountId) : 0) + 1);
         }
 
+        public bool IsEmailExisted(string email, int currentAccountId)
+        {
+            using var context = new FunewsManagementContext();
+            return context.SystemAccounts.Any(a => a.AccountEmail.ToLower() == email.ToLower()
+                                                  && a.AccountId != currentAccountId);
+        }
     }
 }
