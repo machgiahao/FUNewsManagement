@@ -16,7 +16,7 @@ namespace FUNewsManagementSystem.DataAccess
             try
             {
                 using var context = new FunewsManagementContext();
-                listNewsArticles = context.NewsArticles.Include(na => na.Category).ToList();
+                listNewsArticles = context.NewsArticles.Include(na => na.Category).Include(na => na.Tags).ToList();
             }
             catch (Exception ex)
             {
@@ -52,13 +52,46 @@ namespace FUNewsManagementSystem.DataAccess
             try
             {
                 using var context = new FunewsManagementContext();
-                if (newsArticle.Tags != null && newsArticle.Tags.Any())
+
+                // Load the existing article including its tags
+                var existingArticle = context.NewsArticles
+                    .Include(na => na.Tags)
+                    .FirstOrDefault(na => na.NewsArticleId == newsArticle.NewsArticleId);
+
+                if (existingArticle == null)
+                    throw new Exception("NewsArticle not found.");
+
+                // Preserve CreatedDate and CreatedById
+                var createdDate = existingArticle.CreatedDate;
+                var createdById = existingArticle.CreatedById;
+
+                // Update scalar properties
+                context.Entry(existingArticle).CurrentValues.SetValues(newsArticle);
+
+                // Restore CreatedDate and CreatedById
+                existingArticle.CreatedDate = createdDate;
+                existingArticle.CreatedById = createdById;
+
+                // Synchronize tags (your existing logic)
+                var newTagIds = newsArticle.Tags?.Select(t => t.TagId).ToList() ?? new List<int>();
+                var currentTagIds = existingArticle.Tags.Select(t => t.TagId).ToList();
+
+                var tagsToRemove = existingArticle.Tags.Where(t => !newTagIds.Contains(t.TagId)).ToList();
+                foreach (var tag in tagsToRemove)
                 {
-                    var tagIds = newsArticle.Tags.Select(t => t.TagId).ToList();
-                    var existingTags = context.Tags.Where(t => tagIds.Contains(t.TagId)).ToList();
-                    newsArticle.Tags = existingTags;
+                    existingArticle.Tags.Remove(tag);
                 }
-                context.Entry<NewsArticle>(newsArticle).State = EntityState.Modified;
+
+                var tagsToAddIds = newTagIds.Except(currentTagIds).ToList();
+                if (tagsToAddIds.Any())
+                {
+                    var tagsToAdd = context.Tags.Where(t => tagsToAddIds.Contains(t.TagId)).ToList();
+                    foreach (var tag in tagsToAdd)
+                    {
+                        existingArticle.Tags.Add(tag);
+                    }
+                }
+
                 context.SaveChanges();
             }
             catch (Exception ex)
@@ -67,20 +100,29 @@ namespace FUNewsManagementSystem.DataAccess
             }
         }
 
+
         public void DeleteNewsArticle(string newsArticleId)
         {
             try
             {
                 using var context = new FunewsManagementContext();
-                var newsArticle = context.NewsArticles.SingleOrDefault(na => na.NewsArticleId.Equals(newsArticleId));
-                context.NewsArticles.Remove(newsArticle);
-                context.SaveChanges();
+                var newsArticle = context.NewsArticles
+                    .Include(na => na.Tags)
+                    .FirstOrDefault(na => na.NewsArticleId.Equals(newsArticleId));
+                if (newsArticle != null)
+                {
+                    // Detach tags to avoid foreign key constraint issues
+                    newsArticle.Tags.Clear();
+                    context.NewsArticles.Remove(newsArticle);
+                    context.SaveChanges();
+                }
             }
             catch (Exception ex)
             {
                 throw new Exception("Error in DeleteNewsArticle: " + ex.Message);
             }
         }
+
 
         public NewsArticle GetNewsArticleById(string newsArticleId)
         {

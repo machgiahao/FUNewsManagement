@@ -31,10 +31,10 @@ body {
     justify-content: center;
 }
 
-    .brand-img img {
-        width: 32px;
-        height: 32px;
-    }
+.brand-img img {
+    width: 32px;
+    height: 32px;
+}
 
 .search-bar {
     border-radius: 2rem;
@@ -47,12 +47,12 @@ body {
     background: #fff;
 }
 
-    .search-bar input {
-        border: none;
-        outline: none;
-        width: 100%;
-        background: transparent;
-    }
+.search-bar input {
+    border: none;
+    outline: none;
+    width: 100%;
+    background: transparent;
+}
 
 .btn-orange {
     background: linear-gradient(90deg, #ff9800, #ff5722);
@@ -63,10 +63,10 @@ body {
     font-weight: 500;
 }
 
-    .btn-orange:hover {
-        background: linear-gradient(90deg, #ff5722, #ff9800);
-        color: #f8f9fa;
-    }
+.btn-orange:hover {
+    background: linear-gradient(90deg, #ff5722, #ff9800);
+    color: #f8f9fa;
+}
 
 .avatar {
     width: 40px;
@@ -89,12 +89,12 @@ body {
     transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 
-    .btn-register:hover {
-        border-color: #ff9800;
-        color: #ff9800 !important;
-        background: #fff;
-        text-decoration: none;
-    }
+.btn-register:hover {
+    border-color: #ff9800;
+    color: #ff9800 !important;
+    background: #fff;
+    text-decoration: none;
+}
 
 .user-menu-btn {
     background: #f5f7fa;
@@ -105,10 +105,10 @@ body {
     box-shadow: none;
 }
 
-    .user-menu-btn:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px #e3f2fd;
-    }
+.user-menu-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #e3f2fd;
+}
 
 .user-dropdown {
     border-radius: 16px;
@@ -117,11 +117,35 @@ body {
     padding: 12px 0;
 }
 
-    .user-dropdown .dropdown-item {
-        font-size: 1rem;
-        padding: 10px 24px;
-    }
+.user-dropdown .dropdown-item {
+    font-size: 1rem;
+    padding: 10px 24px;
+}
 
-    .user-dropdown .dropdown-divider {
-        margin: 0.5rem 0;
-    }
+.user-dropdown .dropdown-divider {
+    margin: 0.5rem 0;
+}
+
+.navbar .taskbar {
+    display: flex;
+    gap: 36px;
+    align-items: center;
+    border-radius: 8px;
+    padding: 8px 36px;
+    background: #fff;
+}
+
+.navbar .taskbar a {
+    color: #ffa500;
+    font-size: 1.15rem;
+    font-weight: 500;
+    text-decoration: none;
+    margin: 0 8px;
+    transition: color 0.2s;
+    position: relative;
+}
+
+.navbar .taskbar a:hover,
+.navbar .taskbar a.active {
+    color: #2196f3;
+}

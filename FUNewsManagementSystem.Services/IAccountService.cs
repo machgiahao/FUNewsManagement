@@ -18,5 +18,9 @@ namespace FUNewsManagementSystem.Services
 
         public void UpdateSystemAccount(SystemAccount systemAccount);
         SystemAccount GetAccountById(int id);
+        List<SystemAccount> SearchAccounts(string searchField, string searchString);
+        void Register(string name, string email, string password);
+
+
     }
 }

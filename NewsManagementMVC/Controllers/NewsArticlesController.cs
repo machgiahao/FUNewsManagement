@@ -27,18 +27,31 @@ namespace NewsManagementMVC.Controllers
         }
 
         // GET: NewsArticles
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchField, string? searchString, int? tagId)
         {
             var role = HttpContext.Session.GetInt32("Role");
-            var listNewsArticles = _contextNewsArticle.GetNewsArticles();
+            var listNewsArticles = _contextNewsArticle.SearchNewsArticles(searchField, searchString, tagId);
+            var viewModels = listNewsArticles.Select(NewsArticleViewModel.FromNewsArticle).ToList();
+
+            // Prepare edit models for each article
+            var editModels = listNewsArticles
+                .Select(EditNewsArticleViewModel.FromNewsArticle)
+                .ToDictionary(m => m.NewsArticleId);
+
+            ViewBag.Role = role;
+            ViewData["CategoryId"] = new SelectList(_contextCategory.GetCategories(), "CategoryId", "CategoryName");
+            ViewData["TagIds"] = new MultiSelectList(_contextTag.GetTags(), "TagId", "TagName");
+            ViewBag.EditModels = editModels;
+
             if (role == (int)AccountRole.Staff || role == (int)AccountRole.Admin)
             {
-                return View(listNewsArticles.ToList());
+                return View(viewModels);
             }
-            var activeNewsArticles =  listNewsArticles.Where(n => n.NewsStatus == true)
-                                                      .OrderByDescending(n => n.CreatedDate)
-                                                      .ToList(); ;
-            return View(activeNewsArticles);
+            var activeViewModels = viewModels
+                                    .Where(n => n.NewsStatus == true)
+                                    .OrderByDescending(n => n.NewsArticleId) // or another property if you prefer
+                                    .ToList();
+            return View(activeViewModels);
         }
 
         // GET: NewsArticles/Details/5
@@ -59,6 +72,7 @@ namespace NewsManagementMVC.Controllers
         }
 
         // GET: NewsArticles/Create
+        [CustomAuthorize(AccountRole.Staff)]
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_contextCategory.GetCategories(), "CategoryId", "CategoryName");
@@ -71,7 +85,7 @@ namespace NewsManagementMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        
+        [CustomAuthorize(AccountRole.Staff)]
         public async Task<IActionResult> Create(CreateNewsArticleViewModel model)
         {
             if (ModelState.IsValid)
@@ -87,6 +101,7 @@ namespace NewsManagementMVC.Controllers
         }
 
         // GET: NewsArticles/Edit/5
+        [CustomAuthorize(AccountRole.Staff)]
         public async Task<IActionResult> Edit(string? id)
         {
             if (id == null)
@@ -94,22 +109,24 @@ namespace NewsManagementMVC.Controllers
                 return NotFound();
             }
 
-            var newsArticle =  _contextNewsArticle.GetNewsArticleById(id);
+            var newsArticle = _contextNewsArticle.GetNewsArticleById(id);
             if (newsArticle == null)
             {
                 return NotFound();
             }
+            var viewModel = EditNewsArticleViewModel.FromNewsArticle(newsArticle);
             ViewData["CategoryId"] = new SelectList(_contextCategory.GetCategories(), "CategoryId", "CategoryId", newsArticle.CategoryId);
-
-            return View(newsArticle);
+            ViewData["TagIds"] = new MultiSelectList(_contextTag.GetTags(), "TagId", "TagName", viewModel.SelectedTagIds);
+            return View(viewModel);
         }
 
         // POST: NewsArticles/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("NewsArticleId,NewsTitle,Headline,CreatedDate,NewsContent,NewsSource,CategoryId,NewsStatus,CreatedById,UpdatedById,ModifiedDate")] NewsArticle newsArticle)
+        [CustomAuthorize(AccountRole.Staff)]
+        public async Task<IActionResult> Edit(string id, EditNewsArticleViewModel model)
         {
-            if (id != newsArticle.NewsArticleId)
+            if (id != model.NewsArticleId)
             {
                 return NotFound();
             }
@@ -118,11 +135,12 @@ namespace NewsManagementMVC.Controllers
             {
                 try
                 {
-                    _contextNewsArticle.SaveNewsArticle(newsArticle);
+                    var newsArticle = model.ToNewsArticle((short)HttpContext.Session.GetInt32("UserId").Value);
+                    _contextNewsArticle.UpdateNewsArticle(newsArticle);
                 }
                 catch (Exception)
                 {
-                    if (!NewsArticleExists(newsArticle.NewsArticleId))
+                    if (!NewsArticleExists(model.NewsArticleId))
                     {
                         return NotFound();
                     }
@@ -133,11 +151,13 @@ namespace NewsManagementMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_contextCategory.GetCategories(), "CategoryId", "CategoryId", newsArticle.CategoryId);
-            return View(newsArticle);
+            ViewData["CategoryId"] = new SelectList(_contextCategory.GetCategories(), "CategoryId", "CategoryId", model.CategoryId);
+            ViewData["TagIds"] = new MultiSelectList(_contextTag.GetTags(), "TagId", "TagName", model.SelectedTagIds);
+            return View(model);
         }
 
         // GET: NewsArticles/Delete/5
+        [CustomAuthorize(AccountRole.Staff)]
         public async Task<IActionResult> Delete(string? id)
         {
             if (id == null)
@@ -157,6 +177,7 @@ namespace NewsManagementMVC.Controllers
         // POST: NewsArticles/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [CustomAuthorize(AccountRole.Staff)]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var newsArticle = _contextNewsArticle.GetNewsArticleById(id);
@@ -174,14 +195,9 @@ namespace NewsManagementMVC.Controllers
         }
 
         // GET: NewsArticles/Report
+        [CustomAuthorize(AccountRole.Admin)]
         public IActionResult Report(DateTime? startDate, DateTime? endDate)
         {
-            var role = HttpContext.Session.GetString("UserRole");
-            if (role != "Admin")
-            {
-                return Forbid();
-            }
-
             List<NewsArticle> reportData = new();
             if (startDate.HasValue && endDate.HasValue)
             {

@@ -1,89 +1,127 @@
-﻿@model IEnumerable<FUNewsManagementSystem.BusinessObject.NewsArticle>
+﻿@model IEnumerable<NewsArticleViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "News Articles";
+    var editModels = ViewBag.EditModels as Dictionary<string, EditNewsArticleViewModel>;
+    var searchField = Context.Request.Query["searchField"].ToString();
+    var searchString = Context.Request.Query["searchString"].ToString();
+    var tagId = Context.Request.Query["tagId"].ToString();
+    var tags = ViewData["TagIds"] as MultiSelectList;
+    var isStaff = (ViewBag.Role != null && (int)ViewBag.Role == 1);
+    var isAdmin = (ViewBag.Role != null && (int)ViewBag.Role == 0);
 }
 
-<h1>Index</h1>
+<h1 class="mb-4">News Articles</h1>
+@if (isAdmin)
+{
+    <div class="mb-3">
+        <a asp-action="Report" class="btn btn-outline-primary">Report News Articles</a>
+    </div>
+}
+@if (isStaff)
+{
+    <a href="#" data-bs-toggle="modal" data-bs-target="#createModal" class="mb-3 d-inline-block">Create New</a>
+    @await Html.PartialAsync("_CreateModal", new CreateNewsArticleViewModel())
+}
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<form asp-action="Index" method="get" class="mb-4">
+    <div class="row g-2 align-items-center" style="background: #ddd; border-radius: 16px; padding: 20px;">
+        <div class="col-md-2">
+            <select name="searchField" class="form-select">
+                <option value="NewsTitle" selected="@(searchField == "NewsTitle" ? "selected" : null)">News Title</option>
+                <option value="Headline" selected="@(searchField == "Headline" ? "selected" : null)">Headline</option>
+                <option value="NewsSource" selected="@(searchField == "NewsSource" ? "selected" : null)">News Source</option>
+                <option value="CategoryName" selected="@(searchField == "CategoryName" ? "selected" : null)">Category</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="text" name="searchString" class="form-control" placeholder="Search" value="@searchString" />
+        </div>
+        <div class="col-md-2">
+            <select name="tagId" class="form-select">
+                <option value="">All Tags</option>
+                @if (tags != null)
+                {
+                    foreach (var tag in tags)
+                    {
+                        <option value="@tag.Value" selected="@(tagId == tag.Value ? "selected" : null)">@tag.Text</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+        <div class="col-md-2">
+            <a href="/NewsArticles/Index" class="btn btn-link">Clear all</a>
+        </div>
+    </div>
+</form>
+
 <table class="table">
-    <thead>
+    <thead style="background: #e5e5e5;">
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.NewsTitle)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Headline)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NewsContent)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NewsSource)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NewsStatus)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedById)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ModifiedDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedBy)
-            </th>
-            <th></th>
+            <th>@Html.DisplayNameFor(model => model.NewsTitle)</th>
+            <th>@Html.DisplayNameFor(model => model.Headline)</th>
+            <th>@Html.DisplayNameFor(model => model.NewsContent)</th>
+            <th>@Html.DisplayNameFor(model => model.NewsSource)</th>
+            <th>@Html.DisplayNameFor(model => model.NewsStatus)</th>
+            <th>@Html.DisplayNameFor(model => model.CategoryName)</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsTitle)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Headline)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsContent)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsSource)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NewsStatus)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedById)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ModifiedDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.CategoryDesciption)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedBy.AccountId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.NewsArticleId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.NewsArticleId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.NewsArticleId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.NewsTitle)</td>
+                <td>@Html.DisplayFor(modelItem => item.Headline)</td>
+                <td>@Html.DisplayFor(modelItem => item.NewsContent)</td>
+                <td>@Html.DisplayFor(modelItem => item.NewsSource)</td>
+                <td>
+                    @if (item.NewsStatus == true)
+                    {
+                        <span class="text-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger">Inactive</span>
+                    }
+                </td>
+                <td>@Html.DisplayFor(modelItem => item.CategoryName)</td>
+                <td>
+                    @if (isStaff)
+                    {
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-@item.NewsArticleId" class="text-primary">Edit |</a>                       
+                    }
+                    <a asp-action="Details" asp-route-id="@item.NewsArticleId" class="text-primary">Details</a> 
+                    @if (isStaff)
+                    {
+                        <button type = "button" class="btn btn-link text-danger p-0" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.NewsArticleId" style="color: #d32f2f;">| Delete</button>
+                    }   
+                </td>
+            </tr>
+
+            @if (isStaff)
+            {
+                @* Edit Modal *@
+                @await Html.PartialAsync("_EditNewsArticleModal", editModels[item.NewsArticleId], new ViewDataDictionary(ViewData)
+                {
+                    { "Id", $"editModal-{item.NewsArticleId}" }
+                })
+
+                @* Delete Modal *@
+                @await Html.PartialAsync("_DeleteModal", item.NewsArticleId, new ViewDataDictionary(ViewData)
+                {
+                    { "Name", item.NewsTitle }
+                })
+            }
+        }
     </tbody>
 </table>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
