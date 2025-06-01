@@ -1,0 +1,20 @@
+﻿@model string
+<form id="searchForm" method="get"
+      action="@Url.Action(ViewContext.RouteData.Values["action"]?.ToString(), ViewContext.RouteData.Values["controller"]?.ToString())"
+      class="mx-auto flex-grow-1 d-flex justify-content-center"
+      style="max-width: 600px;">
+
+    <div class="search-bar d-flex align-items-center w-100">
+        <img src="~/images/search-icon.png" alt="Search" style="width:24px;height:24px;margin-right:8px;" />
+        <input type="text" name="search" placeholder="Search news article" value="@Model" class="form-control" />
+    </div>
+</form>
+
+<script>
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        const input = this.querySelector('input[name="search"]');
+        if (input.value.trim() === '') {
+            input.removeAttribute('name');
+        }
+    });
+</script>

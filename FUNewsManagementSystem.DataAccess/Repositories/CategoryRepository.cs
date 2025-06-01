@@ -30,7 +30,10 @@ namespace FUNewsManagementSystem.DataAccess
         public Category GetCategoryById(int id)
         {
             using var context = new FunewsManagementContext();
-            return context.Categories.FirstOrDefault(na => na.CategoryId.Equals(id));
+            return context.Categories
+                .Include(c => c.ParentCategory) 
+                .Include(c => c.NewsArticles)
+                .FirstOrDefault(na => na.CategoryId == id);
         }
 
         public void SaveCategory(Category category)
@@ -65,14 +68,32 @@ namespace FUNewsManagementSystem.DataAccess
             try
             {
                 using var context = new FunewsManagementContext();
-                var category = context.Categories.SingleOrDefault(na => na.CategoryId.Equals(id));
+
+                // Find the category to delete
+                var category = context.Categories.FirstOrDefault(c => c.CategoryId == id);
+                if (category == null)
+                {
+                    throw new Exception("Category not found");
+                }
+
+                // Find and update all child categories
+                var childCategories = context.Categories.Where(c => c.ParentCategoryId == id).ToList();
+                foreach (var child in childCategories)
+                {
+                    child.ParentCategoryId = null;
+                }
+
+                // Remove the category
                 context.Categories.Remove(category);
+
+                // Save all changes
                 context.SaveChanges();
             }
             catch (Exception ex)
             {
-                throw new Exception("Error in DeleteCategory: " + ex.Message);
+                throw new Exception("Error in DeleteCategory: " + ex.InnerException?.Message ?? ex.Message);
             }
         }
+
     }
 }

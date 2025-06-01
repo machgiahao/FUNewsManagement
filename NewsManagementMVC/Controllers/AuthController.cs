@@ -33,6 +33,10 @@ namespace NewsManagementMVC.Controllers
                     HttpContext.Session.SetString("Username", user.AccountName);
 
                     HttpContext.Session.SetInt32("Role", user.AccountRole ?? -1);
+                    if(user.AccountRole == 1)
+                    {
+                        return RedirectToAction("Index", "Categories");
+                    }
                     return RedirectToAction("Index", "NewsArticles"); // Redirect to home NewsArticles
                 }
                 else

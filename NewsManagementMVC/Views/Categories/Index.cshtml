@@ -2,52 +2,80 @@
 
 @{
     ViewData["Title"] = "Index";
+    var parentSelectList = new SelectList(Model, "CategoryId", "CategoryName");
 }
 
-<h1>Index</h1>
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="success-alert" class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
+@if (TempData["ErrorMessage"] != null)
+{
+    <div id="error-alert" class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+
+<h1>Category List</h1>
 <p>
-    <a asp-action="Create">Create New</a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#createModal">Create New</a>
+    @await Html.PartialAsync("_CreateModal", new Category(), new ViewDataDictionary(ViewData)
+    {
+    { "ParentCategoryId", parentSelectList }
+    })
+
+
 </p>
+
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CategoryName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CategoryDesciption)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ParentCategory)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.CategoryName)</th>
+            <th>@Html.DisplayNameFor(model => model.CategoryDesciption)</th>
+            <th>@Html.DisplayNameFor(model => model.IsActive)</th>
+            <th>Parent Category</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model)
+{
         <tr>
+            <td>@Html.DisplayFor(modelItem => item.CategoryName)</td>
+            <td>@Html.DisplayFor(modelItem => item.CategoryDesciption)</td>
+            <td>@Html.DisplayFor(modelItem => item.IsActive)</td>
+            <td>@(item.ParentCategory?.CategoryName ?? "None")</td>
             <td>
-                @Html.DisplayFor(modelItem => item.CategoryName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CategoryDesciption)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ParentCategory.CategoryDesciption)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.CategoryId">Edit</a> |
+                <a href="#" data-bs-toggle="modal" data-bs-target="#editModal-@item.CategoryId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.CategoryId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CategoryId">Delete</a>
+                <button type="button" class="btn btn-link text-danger p-0" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.CategoryId">
+                    Delete
+                </button>
             </td>
         </tr>
+
+            @await Html.PartialAsync("_EditModal", item, new ViewDataDictionary(ViewData)
+        {
+        { "Id", $"editModal-{item.CategoryId}" },
+        { "ParentCategoryId", parentSelectList }
+        })
+
+        @* Delete Modal *@
+        @await Html.PartialAsync("_DeleteModal", item.CategoryId.ToString(), new ViewDataDictionary(ViewData)
+        {
+        { "Id", item.CategoryId }
+        })
 }
     </tbody>
 </table>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
