@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FUNewsManagementSystem.Services;
 using FUNewsManagementSystem.BusinessObject;
+using NewsManagementMVC.Models.ViewModels.NewsArticle;
+using FUNewsManagementSystem.BusinessObject.Enums;
+using NewsManagementMVC.Attributes;
 
 namespace NewsManagementMVC.Controllers
 {
@@ -14,19 +17,21 @@ namespace NewsManagementMVC.Controllers
     {
         private readonly INewsArticleService _contextNewsArticle;
         private readonly ICategoryService _contextCategory;
+        private readonly ITagService _contextTag;
 
-        public NewsArticlesController(INewsArticleService contextNewsArticle, ICategoryService contextCategory)
+        public NewsArticlesController(INewsArticleService contextNewsArticle, ICategoryService contextCategory, ITagService contextTag)
         {
             _contextNewsArticle = contextNewsArticle;
             _contextCategory = contextCategory;
+            _contextTag = contextTag;
         }
 
         // GET: NewsArticles
         public async Task<IActionResult> Index()
         {
-            var role = HttpContext.Session.GetString("UserRole");
+            var role = HttpContext.Session.GetInt32("Role");
             var listNewsArticles = _contextNewsArticle.GetNewsArticles();
-            if (role == "Staff" || role == "Admin")
+            if (role == (int)AccountRole.Staff || role == (int)AccountRole.Admin)
             {
                 return View(listNewsArticles.ToList());
             }
@@ -57,6 +62,7 @@ namespace NewsManagementMVC.Controllers
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_contextCategory.GetCategories(), "CategoryId", "CategoryName");
+            ViewData["TagIds"] = new MultiSelectList(_contextTag.GetTags(), "TagId", "TagName");
             return View();
         }
 
@@ -65,15 +71,19 @@ namespace NewsManagementMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NewsArticleId,NewsTitle,Headline,CreatedDate,NewsContent,NewsSource,CategoryId,NewsStatus,CreatedById")] NewsArticle newsArticle)
+        
+        public async Task<IActionResult> Create(CreateNewsArticleViewModel model)
         {
             if (ModelState.IsValid)
             {
+                var userId = HttpContext.Session.GetInt32("UserId");
+                var newsArticle = model.ToNewsArticle((short)userId.Value);
                 _contextNewsArticle.SaveNewsArticle(newsArticle);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_contextCategory.GetCategories(), "CategoryId", "CategoryId", newsArticle.CategoryId);
-            return View(newsArticle);
+            ViewData["CategoryId"] = new SelectList(_contextCategory.GetCategories(), "CategoryId", "CategoryId", model.CategoryId);
+            ViewData["TagIds"] = new MultiSelectList(_contextTag.GetTags(), "TagId", "TagName", model.SelectedTagIds);
+            return View(model);
         }
 
         // GET: NewsArticles/Edit/5
@@ -90,6 +100,7 @@ namespace NewsManagementMVC.Controllers
                 return NotFound();
             }
             ViewData["CategoryId"] = new SelectList(_contextCategory.GetCategories(), "CategoryId", "CategoryId", newsArticle.CategoryId);
+
             return View(newsArticle);
         }
 

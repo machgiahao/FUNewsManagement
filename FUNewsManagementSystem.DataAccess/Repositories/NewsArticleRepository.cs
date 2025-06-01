@@ -30,11 +30,19 @@ namespace FUNewsManagementSystem.DataAccess
             try
             {
                 using var context = new FunewsManagementContext();
+                
+                if (newsArticle.Tags != null && newsArticle.Tags.Any())
+                {
+                    var tagIds = newsArticle.Tags.Select(t => t.TagId).ToList();
+                    var existingTags = context.Tags.Where(t => tagIds.Contains(t.TagId)).ToList();
+                    newsArticle.Tags = existingTags;
+                }
                 context.NewsArticles.Add(newsArticle);
                 context.SaveChanges();
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.InnerException?.Message);
                 throw new Exception("Error in SaveNewsArticle: " + ex.Message);
             }
         }
@@ -44,6 +52,12 @@ namespace FUNewsManagementSystem.DataAccess
             try
             {
                 using var context = new FunewsManagementContext();
+                if (newsArticle.Tags != null && newsArticle.Tags.Any())
+                {
+                    var tagIds = newsArticle.Tags.Select(t => t.TagId).ToList();
+                    var existingTags = context.Tags.Where(t => tagIds.Contains(t.TagId)).ToList();
+                    newsArticle.Tags = existingTags;
+                }
                 context.Entry<NewsArticle>(newsArticle).State = EntityState.Modified;
                 context.SaveChanges();
             }

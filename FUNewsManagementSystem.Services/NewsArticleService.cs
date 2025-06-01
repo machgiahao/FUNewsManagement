@@ -2,6 +2,7 @@
 using FUNewsManagementSystem.BusinessObject;
 using FUNewsManagementSystem.DataAccess;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,41 +13,44 @@ namespace FUNewsManagementSystem.Services
 {
     public class NewsArticleService : INewsArticleService
     {
-        private readonly INewsArticleRepository iNewsArticleRepository;
+        private readonly INewsArticleRepository _iNewsArticleRepository;
+        private readonly IConfiguration _config;
 
-        public NewsArticleService()
+        public NewsArticleService(IAccountRepository iAccountRepository, IConfiguration config)
         {
-            this.iNewsArticleRepository = new NewsArticleRepository();
+            this._iNewsArticleRepository = new NewsArticleRepository();
+            this._config = config;
         }
 
         public List<NewsArticle> GetNewsArticles()
         {
-            return iNewsArticleRepository.GetNewsArticles();
+            return _iNewsArticleRepository.GetNewsArticles();
         }
 
         public void SaveNewsArticle(NewsArticle newsArticle)
         {
-            iNewsArticleRepository.SaveNewsArticle(newsArticle);
+            var createdById = _config["AdminAccount:Email"];
+            _iNewsArticleRepository.SaveNewsArticle(newsArticle);
         }
 
         public void UpdateNewsArticle(NewsArticle newsArticle)
         {
-            iNewsArticleRepository.UpdateNewsArticle(newsArticle);
+            _iNewsArticleRepository.UpdateNewsArticle(newsArticle);
         }
 
         public void DeleteNewsArticle(string newsArticleId)
         {
-            iNewsArticleRepository.DeleteNewsArticle(newsArticleId);
+            _iNewsArticleRepository.DeleteNewsArticle(newsArticleId);
         }
 
         public NewsArticle GetNewsArticleById(string newsArticleId)
         {
-            return iNewsArticleRepository.GetNewsArticleById(newsArticleId);
+            return _iNewsArticleRepository.GetNewsArticleById(newsArticleId);
         }
 
         public List<NewsArticle> GetNewsArticlesByPeriod(DateTime startDate, DateTime endDate)
         {
-            return iNewsArticleRepository.GetNewsArticlesByPeriod(startDate, endDate);
+            return _iNewsArticleRepository.GetNewsArticlesByPeriod(startDate, endDate);
         }
 
     }

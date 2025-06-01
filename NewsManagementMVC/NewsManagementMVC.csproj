@@ -16,10 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\ViewModels\NewsArticle\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\FUNewsManagementSystem.Services\FUNewsManagementSystem.Services.csproj" />
   </ItemGroup>
 

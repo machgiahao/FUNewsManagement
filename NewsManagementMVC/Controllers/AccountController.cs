@@ -124,26 +124,6 @@ namespace NewsManagementMVC.Controllers
             return View(model);
         }
 
-        //// GET: Account/Delete/5
-        //[CustomAuthorize(AccountRole.Admin)]
-        //public IActionResult Delete(int? id)
-        //{
-
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var newsArticle = _accountService.GetAccountById((int)id);
-        //    if (newsArticle == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(newsArticle);
-        //}
-
-
         // POST: Account/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
