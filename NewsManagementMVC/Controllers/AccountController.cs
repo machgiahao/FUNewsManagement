@@ -23,10 +23,10 @@ namespace NewsManagementMVC.Controllers
 
         // GET: Account/Index
         [CustomAuthorize(AccountRole.Admin)]
-        public IActionResult Index()
+        public IActionResult Index(string searchField, string searchString)
         {
-            var listAccounts = _accountService.GetAllAccounts().ToList();
-            var viewModels = listAccounts.Select(AccountViewModel.FromSystemAccount).ToList();
+            var accounts = _accountService.SearchAccounts(searchField, searchString);
+            var viewModels = accounts.Select(AccountViewModel.FromSystemAccount).ToList();
             return View(viewModels);
         }
 

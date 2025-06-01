@@ -48,5 +48,35 @@ namespace NewsManagementMVC.Controllers
             HttpContext.Session.Clear(); // Clear session data
             return RedirectToAction("Index", "NewsArticles");
         }
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                // Call your service or repository to create the account
+                _accountService.Register(model.AccountName, model.AccountEmail, model.AccountPassword);
+                TempData["RegisterSuccess"] = true;
+                return RedirectToAction("Login");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("REGISTER_FAIL", $"Error in adding account: {ex.Message}");
+                return View(model);
+            }
+        }
+
+
     }
 }

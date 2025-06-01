@@ -3,20 +3,57 @@
 @{
     ViewData["Title"] = "Index";
 }
+<style>
+    .table thead th {
+        background-color: #ddd !important;
+        font-weight: bold;
+    }
 
-<h1>Index</h1>
+    .card {
+        border-radius: 12px;
+        border: 1px solid #e0e0e0;
+    }
+</style>
+
+<h1>Accounts</h1>
 
 <p>
     <a href="#" data-bs-toggle="modal" data-bs-target="#createModal">Create New</a>
     @await Html.PartialAsync("_CreateModal", new CreateAccountViewModel())
 </p>
+
+<form asp-action="Index" method="get" class="mb-4">
+    <div class="card p-3 mb-3" style="background-color: #f8f9fa;">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-3">
+                <select class="form-select" name="searchField">
+                    <option value="AccountName" selected="@(Context.Request.Query["searchField"] == "AccountName" ? "selected" : null)">Account Name</option>
+                    <option value="AccountEmail" selected="@(Context.Request.Query["searchField"] == "AccountEmail" ? "selected" : null)">Email</option>
+                    <option value="AccountRole" selected="@(Context.Request.Query["searchField"] == "AccountRole" ? "selected" : null)">Role</option>
+
+                </select>
+            </div>
+            <div class="col-md-5">
+                    <input type="text" name="searchString" value="@(Context.Request.Query["searchString"])" class="form-control" placeholder="Search" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Search</button>
+            </div>
+            <div class="col-md-2">
+                <a href="/Account/Index" class="btn btn-link">Clear all</a>
+            </div>
+        </div>
+    </div>
+</form>
+
+
 <table class="table">
     <thead>
         <tr>
             <th>@Html.DisplayNameFor(model => model.AccountName)</th>
             <th>@Html.DisplayNameFor(model => model.AccountEmail)</th>
             <th>@Html.DisplayNameFor(model => model.AccountRole)</th>
-            <th></th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -46,15 +83,15 @@
 
             @* Edit Modal *@
             @await Html.PartialAsync("_EditModal", item, new ViewDataDictionary(ViewData)
-            {
-                { "Id", $"editModal-{item.AccountId}" }
-            })
+        {
+        { "Id", $"editModal-{item.AccountId}" }
+        })
 
             @* Delete Modal *@
             @await Html.PartialAsync("_DeleteModal", item.AccountId.ToString(), new ViewDataDictionary(ViewData)
-            {
-                { "Name", item.AccountName }
-            })
+        {
+        { "Name", item.AccountName }
+        })
         }
     </tbody>
 </table>

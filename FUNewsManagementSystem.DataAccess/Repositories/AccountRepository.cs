@@ -65,6 +65,10 @@ namespace FUNewsManagementSystem.DataAccess
             try
             {
                 using var context = new FunewsManagementContext();
+                if (systemAccount.AccountId == 0)
+                {
+                    systemAccount.AccountId = GetNextAccountId(context);
+                }
                 context.SystemAccounts.Add(systemAccount);
                 context.SaveChanges();
             }
@@ -87,5 +91,11 @@ namespace FUNewsManagementSystem.DataAccess
                 throw new Exception("Error in updating account: " + ex.Message);
             }
         }
+
+        private short GetNextAccountId(FunewsManagementContext context)
+        {
+            return (short)((context.SystemAccounts.Any() ? context.SystemAccounts.Max(a => a.AccountId) : 0) + 1);
+        }
+
     }
 }

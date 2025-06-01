@@ -1,6 +1,8 @@
 ﻿@{
     var isLoggedIn = Context.Session.GetString("Username") != null;
     var username = Context.Session.GetString("Username");
+    var isAdmin = Context.Session.GetInt32("Role") == 0;
+    var isStaff= Context.Session.GetInt32("Role") == 1;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -15,19 +17,27 @@
 <body>
 
     <header>
-        <nav class="navbar bg-white border-bottom box-shadow mb-3 py-3">
+        <nav class="navbar bg-white border-bottom box-shadow mb-3 py-3 px-4">
             <div class="container-fluid d-flex align-items-center justify-content-between">
                 <!-- Left -->
                 <div class="d-flex align-items-center">
                     <a href="/NewsArticles/Index"><img src="~/images/logo.jpg" alt="FPT University" style="height:48px; width:auto;" /></a>
                 </div>
-                <!-- Center: Search Bar -->
-                <form class="mx-auto flex-grow-1 d-flex justify-content-center" style="max-width: 600px;">
-                    <div class="search-bar">
-                        <img src="~/images/search-icon.png" alt="Search" style="width:24px;height:24px;margin-right:8px;" />
-                        <input type="text" placeholder="Search news article" />
-                    </div>
-                </form>
+                <!-- Task bar-->
+                <div class="taskbar">
+                    @if(isStaff || isAdmin)
+                    {
+                        <a href="/NewsArticles/Index" class="">News</a>    
+                    }
+                    @if(isStaff)
+                    {
+                        <a href="/Category/Index" class="">Category</a>
+                    }
+                    @if(isAdmin)
+                    {
+                        <a href="/Account/Index" class="">Accounts</a>                       
+                    }
+                </div>
                 <!-- Right -->
                 <div class="d-flex align-items-center">
                     @if (!isLoggedIn)
