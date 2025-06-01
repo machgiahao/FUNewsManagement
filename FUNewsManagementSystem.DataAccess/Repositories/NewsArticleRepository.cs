@@ -127,7 +127,12 @@ namespace FUNewsManagementSystem.DataAccess
         public NewsArticle GetNewsArticleById(string newsArticleId)
         {
             using var context = new FunewsManagementContext();
-            return context.NewsArticles.FirstOrDefault(na => na.NewsArticleId.Equals(newsArticleId));
+            // Example using Entity Framework
+            var article = context.NewsArticles
+                .Include(n => n.Category)
+                .Include(n => n.CreatedBy)
+                .FirstOrDefault(n => n.NewsArticleId == newsArticleId);
+            return article;
         }
 
         public List<NewsArticle> GetNewsArticlesByPeriod(DateTime startDate, DateTime endDate)
