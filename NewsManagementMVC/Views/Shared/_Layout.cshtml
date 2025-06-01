@@ -22,12 +22,11 @@
                     <a href="/NewsArticles/Index"><img src="~/images/logo.jpg" alt="FPT University" style="height:48px; width:auto;" /></a>
                 </div>
                 <!-- Center: Search Bar -->
-                <form class="mx-auto flex-grow-1 d-flex justify-content-center" style="max-width: 600px;">
-                    <div class="search-bar">
-                        <img src="~/images/search-icon.png" alt="Search" style="width:24px;height:24px;margin-right:8px;" />
-                        <input type="text" placeholder="Search news article" />
-                    </div>
-                </form>
+                @if (ViewData["ShowSearch"] as bool? == true)
+                {
+                    @await Html.PartialAsync("_SearchBar", Context.Request.Query["search"].ToString())
+                }
+
                 <!-- Right -->
                 <div class="d-flex align-items-center">
                     @if (!isLoggedIn)
@@ -70,6 +69,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
