@@ -22,5 +22,6 @@ namespace FUNewsManagementSystem.Services
         public List<string> GetAllAccountEmails();
         bool IsEmailExisted(string email, int currentAccountId);
         public bool HasAccountChanged(string newName, string newEmail, SystemAccount existing);
+        bool ChangePassword(int userId, string currentPassword, string newPassword, out string errorMessage);
     }
 }

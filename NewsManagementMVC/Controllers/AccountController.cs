@@ -174,7 +174,6 @@ namespace NewsManagementMVC.Controllers
                 return View("Profile", model);
             }
 
-            // Gọi logic kiểm tra thay đổi 1 lần duy nhất ở service
             if (!_accountService.HasAccountChanged(model.AccountName, model.AccountEmail, account))
             {
                 TempData["InfoMessage"] = "You have already updated your profile. No changes detected.";
@@ -187,7 +186,6 @@ namespace NewsManagementMVC.Controllers
                 return View("Profile", model);
             }
 
-            // Cập nhật dữ liệu từ model vào entity trước khi lưu
             account.AccountName = model.AccountName?.Trim();
             account.AccountEmail = model.AccountEmail?.Trim();
 
@@ -205,8 +203,6 @@ namespace NewsManagementMVC.Controllers
             return RedirectToAction("Profile");
         }
 
-
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ChangePassword(ChangePasswordViewModel model)
@@ -214,40 +210,28 @@ namespace NewsManagementMVC.Controllers
             if (!ModelState.IsValid)
             {
                 TempData["PasswordError"] = string.Join(" ", ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage));
+                                                  .SelectMany(v => v.Errors)
+                                                  .Select(e => e.ErrorMessage));
                 return RedirectToAction("Profile");
             }
 
-            var userId = HttpContext.Session.GetInt32("UserId");
-            var account = _accountService.GetCurrentAccount(userId.Value);
+            var account = HttpContext.Session.GetInt32("UserId");
             if (account == null)
             {
-                TempData["PasswordError"] = "Account not found.";
+                TempData["PasswordError"] = "Session expired. Please log in again.";
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var result = _accountService.ChangePassword(account.Value, model.CurrentPassword, model.NewPassword, out string errorMessage);
+            if (!result)
+            {
+                TempData["PasswordError"] = errorMessage;
                 return RedirectToAction("Profile");
             }
 
-            if (!account.AccountPassword.Equals(model.CurrentPassword))
-            {
-                TempData["PasswordError"] = "Current password is incorrect.";
-                return RedirectToAction("Profile");
-            }
-
-            try
-            {
-                account.AccountPassword = model.NewPassword;
-                _accountService.UpdateSystemAccount(account);
-                TempData["PasswordSuccess"] = "Password changed successfully.";
-            }
-            catch (Exception ex)
-            {
-                TempData["PasswordError"] = "Error changing password: " + ex.Message;
-            }
-
+            TempData["PasswordSuccess"] = "Password changed successfully.";
             return RedirectToAction("Profile");
         }
-
-
     }
 }
 

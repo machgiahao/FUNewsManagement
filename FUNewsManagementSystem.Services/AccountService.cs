@@ -74,5 +74,36 @@ namespace FUNewsManagementSystem.Services
             return !string.Equals(newName?.Trim(), existing.AccountName, StringComparison.Ordinal) ||
                    !string.Equals(newEmail?.Trim(), existing.AccountEmail, StringComparison.OrdinalIgnoreCase);
         }
+
+        public bool ChangePassword(int userId, string currentPassword, string newPassword, out string errorMessage)
+        {
+            var account = _iAccountRepository.GetAccountById(userId);
+            if (account == null)
+            {
+                errorMessage = "Account not found.";
+                return false;
+            }
+
+            if (!account.AccountPassword.Equals(currentPassword))
+            {
+                errorMessage = "Current password is incorrect.";
+                return false;
+            }
+
+            account.AccountPassword = newPassword;
+
+            try
+            {
+                _iAccountRepository.UpdateSystemAccount(account);
+                errorMessage = string.Empty;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = "Error changing password: " + ex.Message;
+                return false;
+            }
+        }
+
     }
 }
