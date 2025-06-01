@@ -147,8 +147,8 @@ namespace NewsManagementMVC.Controllers
 
         public IActionResult Profile()
         {
-            var userId = HttpContext.Session.GetString("UserId");
-            var account = _accountService.GetCurrentAccount(int.Parse(userId ?? "0"));
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var account = _accountService.GetCurrentAccount(userId.Value);
             if (account == null)
             {
                 return RedirectToAction("Login", "Auth");
@@ -162,44 +162,11 @@ namespace NewsManagementMVC.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult UpdateProfile(AccountViewModel model)
         {
-            var userId = HttpContext.Session.GetString("UserId");
-            var account = _accountService.GetCurrentAccount(int.Parse(userId ?? "0"));
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var account = _accountService.GetCurrentAccount(userId.Value);
             if (account == null)
             {
                 return RedirectToAction("Login", "Auth");
-            }
-
-            // Not Uptdate
-            bool isNameChanged = !string.Equals(model.AccountName?.Trim(), account.AccountName, StringComparison.Ordinal);
-            bool isEmailChanged = !string.Equals(model.AccountEmail?.Trim(), account.AccountEmail, StringComparison.OrdinalIgnoreCase);
-
-            if (!isNameChanged && !isEmailChanged)
-            {
-                TempData["InfoMessage"] = "You have already updated your profile. No changes detected.";
-                return RedirectToAction("Profile");
-            }
-
-            // Update ==> Validate
-            if (string.IsNullOrWhiteSpace(model.AccountName) || model.AccountName.Trim().Length <= 2)
-            {
-                ModelState.AddModelError(nameof(model.AccountName), "Name must be longer than 2 characters.");
-            }
-
-            if (string.IsNullOrWhiteSpace(model.AccountEmail) || !model.AccountEmail.Contains("@"))
-            {
-                ModelState.AddModelError(nameof(model.AccountEmail), "Email must contain '@'.");
-            }
-            else
-            {
-                // Check mail existed
-                var allEmails = _accountService.GetAllAccountEmails()
-                                               .Where(e => !e.Equals(account.AccountEmail, StringComparison.OrdinalIgnoreCase))
-                                               .ToList();
-
-                if (allEmails.Contains(model.AccountEmail.Trim(), StringComparer.OrdinalIgnoreCase))
-                {
-                    ModelState.AddModelError(nameof(model.AccountEmail), "Email is already in use.");
-                }
             }
 
             if (!ModelState.IsValid)
@@ -207,12 +174,27 @@ namespace NewsManagementMVC.Controllers
                 return View("Profile", model);
             }
 
-            account.AccountName = model.AccountName.Trim();
-            account.AccountEmail = model.AccountEmail.Trim();
+            // Gọi logic kiểm tra thay đổi 1 lần duy nhất ở service
+            if (!_accountService.HasAccountChanged(model.AccountName, model.AccountEmail, account))
+            {
+                TempData["InfoMessage"] = "You have already updated your profile. No changes detected.";
+                return RedirectToAction("Profile");
+            }
+
+            if (_accountService.IsEmailExisted(model.AccountEmail!.Trim(), account.AccountId))
+            {
+                ModelState.AddModelError(nameof(model.AccountEmail), "Email is already in use.");
+                return View("Profile", model);
+            }
+
+            // Cập nhật dữ liệu từ model vào entity trước khi lưu
+            account.AccountName = model.AccountName?.Trim();
+            account.AccountEmail = model.AccountEmail?.Trim();
 
             try
             {
                 _accountService.UpdateSystemAccount(account);
+                TempData["SuccessMessage"] = "Profile updated successfully.";
             }
             catch (Exception ex)
             {
@@ -220,51 +202,41 @@ namespace NewsManagementMVC.Controllers
                 return View("Profile", model);
             }
 
-            TempData["SuccessMessage"] = "Profile updated successfully.";
             return RedirectToAction("Profile");
         }
 
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ChangePassword(string CurrentPassword, string NewPassword, string ConfirmPassword)
+        public IActionResult ChangePassword(ChangePasswordViewModel model)
         {
-            var userId = HttpContext.Session.GetString("UserId");
-            var account = _accountService.GetCurrentAccount(int.Parse(userId ?? "0"));
+            if (!ModelState.IsValid)
+            {
+                TempData["PasswordError"] = string.Join(" ", ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage));
+                return RedirectToAction("Profile");
+            }
+
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var account = _accountService.GetCurrentAccount(userId.Value);
             if (account == null)
             {
                 TempData["PasswordError"] = "Account not found.";
                 return RedirectToAction("Profile");
             }
 
-            if (string.IsNullOrWhiteSpace(CurrentPassword) || string.IsNullOrWhiteSpace(NewPassword) || string.IsNullOrWhiteSpace(ConfirmPassword))
-            {
-                TempData["PasswordError"] = "All fields are required.";
-                return RedirectToAction("Profile");
-            }
-
-            if (!account.AccountPassword.Equals(CurrentPassword))
+            if (!account.AccountPassword.Equals(model.CurrentPassword))
             {
                 TempData["PasswordError"] = "Current password is incorrect.";
                 return RedirectToAction("Profile");
             }
 
-            if (NewPassword.Length < 6)
-            {
-                TempData["PasswordError"] = "New password must be at least 6 characters.";
-                return RedirectToAction("Profile");
-            }
-
-            if (!NewPassword.Equals(ConfirmPassword))
-            {
-                TempData["PasswordError"] = "New password and confirmation do not match.";
-                return RedirectToAction("Profile");
-            }
-
             try
             {
-                account.AccountPassword = NewPassword;
+                account.AccountPassword = model.NewPassword;
                 _accountService.UpdateSystemAccount(account);
-
                 TempData["PasswordSuccess"] = "Password changed successfully.";
             }
             catch (Exception ex)
@@ -274,6 +246,7 @@ namespace NewsManagementMVC.Controllers
 
             return RedirectToAction("Profile");
         }
+
 
     }
 }

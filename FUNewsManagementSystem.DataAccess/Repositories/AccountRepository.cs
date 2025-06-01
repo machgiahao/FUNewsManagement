@@ -87,5 +87,12 @@ namespace FUNewsManagementSystem.DataAccess
                 throw new Exception("Error in updating account: " + ex.Message);
             }
         }
+
+        public bool IsEmailExisted(string email, int currentAccountId)
+        {
+            using var context = new FunewsManagementContext();
+            return context.SystemAccounts.Any(a => a.AccountEmail.ToLower() == email.ToLower()
+                                                  && a.AccountId != currentAccountId);
+        }
     }
 }

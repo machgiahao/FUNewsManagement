@@ -1,5 +1,6 @@
 ﻿using FUNewsManagementSystem.BusinessObject;
 using FUNewsManagementSystem.DataAccess;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -62,6 +63,16 @@ namespace FUNewsManagementSystem.Services
                                                                        .Where(a => !string.IsNullOrWhiteSpace(a.AccountEmail))
                                                                        .Select(a => a.AccountEmail.ToLower())
                                                                        .ToList();
-    }
 
+        public bool IsEmailExisted(string email, int currentAccountId)
+        {
+            return _iAccountRepository.IsEmailExisted(email, currentAccountId);
+        }
+
+        public bool HasAccountChanged(string newName, string newEmail, SystemAccount existing)
+        {
+            return !string.Equals(newName?.Trim(), existing.AccountName, StringComparison.Ordinal) ||
+                   !string.Equals(newEmail?.Trim(), existing.AccountEmail, StringComparison.OrdinalIgnoreCase);
+        }
+    }
 }

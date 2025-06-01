@@ -20,5 +20,7 @@ namespace FUNewsManagementSystem.Services
         SystemAccount GetAccountById(int id);
         public SystemAccount GetCurrentAccount(int id);
         public List<string> GetAllAccountEmails();
+        bool IsEmailExisted(string email, int currentAccountId);
+        public bool HasAccountChanged(string newName, string newEmail, SystemAccount existing);
     }
 }
