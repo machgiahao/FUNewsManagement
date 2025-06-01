@@ -1,4 +1,16 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿setTimeout(() => {
+    const successAlert = document.getElementById("success-alert");
+    const errorAlert = document.getElementById("error-alert");
 
-// Write your JavaScript code.
+    if (successAlert) {
+        successAlert.classList.remove("show");
+        successAlert.classList.add("fade");
+        setTimeout(() => successAlert.remove(), 500);
+    }
+
+    if (errorAlert) {
+        errorAlert.classList.remove("show");
+        errorAlert.classList.add("fade");
+        setTimeout(() => errorAlert.remove(), 500);
+    }
+}, 3000);

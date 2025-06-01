@@ -29,14 +29,27 @@
             @Html.DisplayFor(model => model.IsActive)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ParentCategory)
+            @Html.DisplayNameFor(model => model.ParentCategoryId)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ParentCategory.CategoryDesciption)
+            @Html.Encode(Model.ParentCategory?.CategoryName ?? "None")
         </dd>
     </dl>
+    <h4>Related News Articles</h4>
+    @if (Model.NewsArticles != null && Model.NewsArticles.Any())
+    {
+        <ul>
+            @foreach (var article in Model.NewsArticles)
+            {
+                <li>@article.NewsTitle</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No news articles found for this category.</p>
+    }
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.CategoryId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

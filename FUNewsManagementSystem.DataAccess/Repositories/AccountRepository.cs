@@ -65,6 +65,10 @@ namespace FUNewsManagementSystem.DataAccess
             try
             {
                 using var context = new FunewsManagementContext();
+                if (systemAccount.AccountId == 0)
+                {
+                    systemAccount.AccountId = GetNextAccountId(context);
+                }
                 context.SystemAccounts.Add(systemAccount);
                 context.SaveChanges();
             }
@@ -88,11 +92,10 @@ namespace FUNewsManagementSystem.DataAccess
             }
         }
 
-        public bool IsEmailExisted(string email, int currentAccountId)
+        private short GetNextAccountId(FunewsManagementContext context)
         {
-            using var context = new FunewsManagementContext();
-            return context.SystemAccounts.Any(a => a.AccountEmail.ToLower() == email.ToLower()
-                                                  && a.AccountId != currentAccountId);
+            return (short)((context.SystemAccounts.Any() ? context.SystemAccounts.Max(a => a.AccountId) : 0) + 1);
         }
+
     }
 }

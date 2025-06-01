@@ -33,7 +33,17 @@
             <tr>
                 <td>@item.NewsTitle</td>
                 <td>@item.CreatedDate?.ToString("yyyy-MM-dd")</td>
-                <td>@(item.NewsStatus == true ? "Active" : "Inactive")</td>
+                <td>
+                    @if (item.NewsStatus == true)
+                    {
+                        <span class="text-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="text-danger">Inactive</span>
+                    }
+                </td>
+
             </tr>
         }
         </tbody>

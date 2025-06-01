@@ -15,6 +15,7 @@ namespace FUNewsManagementSystem.Services
         void DeleteNewsArticle(string newsArticleId);
         NewsArticle GetNewsArticleById(string newsArticleId);
         List<NewsArticle> GetNewsArticlesByPeriod(DateTime startDate, DateTime endDate);
+        List<NewsArticle> SearchNewsArticles(string searchField, string searchString, int? tagId = null);
         List<NewsArticle> GetListNewsArticlesByCreator(int userId);
         NewsArticle GetDetailNewsArticleById(string newArticleId);
     }

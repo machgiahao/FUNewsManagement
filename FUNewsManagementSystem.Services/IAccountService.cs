@@ -18,10 +18,13 @@ namespace FUNewsManagementSystem.Services
 
         public void UpdateSystemAccount(SystemAccount systemAccount);
         SystemAccount GetAccountById(int id);
+        List<SystemAccount> SearchAccounts(string searchField, string searchString);
+        void Register(string name, string email, string password);
         public SystemAccount GetCurrentAccount(int id);
         public List<string> GetAllAccountEmails();
         bool IsEmailExisted(string email, int currentAccountId);
         public bool HasAccountChanged(string newName, string newEmail, SystemAccount existing);
         bool ChangePassword(int userId, string currentPassword, string newPassword, out string errorMessage);
+
     }
 }

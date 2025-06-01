@@ -4,75 +4,87 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<style>
+    .details-container {
+        max-width: 700px;
+        margin: 40px auto;
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px 0 rgba(60,60,60,0.12), 0 1.5px 6px 0 rgba(60,60,60,0.08);
+        padding: 36px 40px 28px 40px;
+    }
 
-<div>
-    <h4>NewsArticle</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NewsTitle)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NewsTitle)
+    .details-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    .details-subtitle {
+        font-size: 1.3rem;
+        color: #ffa726;
+        font-weight: 500;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .details-list dt {
+        font-weight: 600;
+        color: #444;
+        width: 160px;
+        float: left;
+        clear: left;
+        margin-bottom: 10px;
+    }
+
+    .details-list dd {
+        margin-left: 180px;
+        margin-bottom: 10px;
+        color: #222;
+        word-break: break-word;
+    }
+
+    .details-list {
+        margin-bottom: 1.5rem;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-top: 18px;
+        color: #ff9800;
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+        .back-link:hover {
+            color: #ff5722;
+            text-decoration: underline;
+        }
+</style>
+
+<div class="details-container">
+    <div class="details-subtitle">@Model.NewsTitle</div>
+    <dl class="details-list">
+        <dt>Headline</dt>
+        <dd>@Model.Headline</dd>
+        <dt>Created Date</dt>
+        <dd>
+            @(Model.CreatedDate.HasValue ? Model.CreatedDate.Value.ToString("g") : "N/A")
         </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Headline)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Headline)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NewsContent)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NewsContent)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NewsSource)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NewsSource)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.NewsStatus)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.NewsStatus)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdatedById)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdatedById)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ModifiedDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ModifiedDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.CategoryDesciption)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedBy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedBy.AccountId)
-        </dd>
+        <dt>Content</dt>
+        <dd>@Model.NewsContent</dd>
+        <dt>Source</dt>
+        <dd>@(string.IsNullOrEmpty(Model.NewsSource) ? "N/A" : Model.NewsSource)</dd>
+        <dt>Status</dt>
+        <dd>@(Model.NewsStatus == true ? "Active" : Model.NewsStatus == false ? "Inactive" : "N/A")</dd>
+        <dt>Category</dt>
+        <dd>@(Model.Category != null ? Model.Category.CategoryName : "N/A")</dd>
+        <dt>Created By</dt>
+        <dd>@(Model.CreatedBy != null ? Model.CreatedBy.AccountName : "N/A")</dd>
+
     </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.NewsArticleId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" class="back-link">← Back to List</a>
 </div>
