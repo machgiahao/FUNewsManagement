@@ -90,7 +90,53 @@ namespace FUNewsManagementSystem.Services
             _iAccountRepository.SaveSystemAccount(account);
         }
 
+        public SystemAccount GetCurrentAccount(int id) => _iAccountRepository.GetAccountById(id);
 
+        public List<string> GetAllAccountEmails() => _iAccountRepository.GetAllAccounts()
+                                                                       .Where(a => !string.IsNullOrWhiteSpace(a.AccountEmail))
+                                                                       .Select(a => a.AccountEmail.ToLower())
+                                                                       .ToList();
+
+        public bool IsEmailExisted(string email, int currentAccountId)
+        {
+            return _iAccountRepository.IsEmailExisted(email, currentAccountId);
+        }
+
+        public bool HasAccountChanged(string newName, string newEmail, SystemAccount existing)
+        {
+            return !string.Equals(newName?.Trim(), existing.AccountName, StringComparison.Ordinal) ||
+                   !string.Equals(newEmail?.Trim(), existing.AccountEmail, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public bool ChangePassword(int userId, string currentPassword, string newPassword, out string errorMessage)
+        {
+            var account = _iAccountRepository.GetAccountById(userId);
+            if (account == null)
+            {
+                errorMessage = "Account not found.";
+                return false;
+            }
+
+            if (!account.AccountPassword.Equals(currentPassword))
+            {
+                errorMessage = "Current password is incorrect.";
+                return false;
+            }
+
+            account.AccountPassword = newPassword;
+
+            try
+            {
+                _iAccountRepository.UpdateSystemAccount(account);
+                errorMessage = string.Empty;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                errorMessage = "Error changing password: " + ex.Message;
+                return false;
+            }
+        }
 
     }
 

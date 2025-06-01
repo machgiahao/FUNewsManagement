@@ -15,5 +15,6 @@ namespace FUNewsManagementSystem.DataAccess
         void UpdateSystemAccount(SystemAccount systemAccount);
         void DeleteSystemAccount(int id);
         List<SystemAccount> GetAllAccounts();
+        bool IsEmailExisted(string email, int currentAccountId);
     }
 }

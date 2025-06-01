@@ -56,7 +56,11 @@
                                 <span class="text-primary">Hey, @username</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end user-dropdown" aria-labelledby="userMenuDropdown">
-                                <li><a class="dropdown-item" href="#">Profile</a></li>
+                                <li><a class="dropdown-item" href="/Account/Profile">Profile</a></li>
+                                @if (isStaff)
+                                {
+                                    <li><a class="dropdown-item" href="/NewsArticles/MyNewsArticle">My News Article</a></li>
+                                }
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item text-danger" href="/Auth/Logout">Logout</a></li>
                             </ul>

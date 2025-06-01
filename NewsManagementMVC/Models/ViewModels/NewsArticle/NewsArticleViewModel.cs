@@ -11,6 +11,7 @@ namespace NewsManagementMVC.Models.ViewModels.NewsArticle
         public string NewsSource { get; set; }
         public bool? NewsStatus { get; set; }
         public string CategoryName { get; set; }
+        public DateTime? CreatedDate { get; set; }
         public List<int> SelectedTagIds { get; set; } = new();
         public static NewsArticleViewModel FromNewsArticle(EntityNewsArticle n)
         {

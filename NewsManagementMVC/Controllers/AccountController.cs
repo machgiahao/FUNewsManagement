@@ -144,7 +144,94 @@ namespace NewsManagementMVC.Controllers
             var model = AccountViewModel.FromSystemAccount(account);
             return (account == null) ? false : true;
         }
-    }
 
+        public IActionResult Profile()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var account = _accountService.GetCurrentAccount(userId.Value);
+            if (account == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var viewModel = AccountViewModel.FromSystemAccount(account);
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateProfile(AccountViewModel model)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var account = _accountService.GetCurrentAccount(userId.Value);
+            if (account == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View("Profile", model);
+            }
+
+            if (!_accountService.HasAccountChanged(model.AccountName, model.AccountEmail, account))
+            {
+                TempData["InfoMessage"] = "You have already updated your profile. No changes detected.";
+                return RedirectToAction("Profile");
+            }
+
+            if (_accountService.IsEmailExisted(model.AccountEmail!.Trim(), account.AccountId))
+            {
+                ModelState.AddModelError(nameof(model.AccountEmail), "Email is already in use.");
+                return View("Profile", model);
+            }
+
+            account.AccountName = model.AccountName?.Trim();
+            account.AccountEmail = model.AccountEmail?.Trim();
+
+            try
+            {
+                _accountService.UpdateSystemAccount(account);
+                TempData["SuccessMessage"] = "Profile updated successfully.";
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Error updating profile: " + ex.Message);
+                return View("Profile", model);
+            }
+
+            return RedirectToAction("Profile");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["PasswordError"] = string.Join(" ", ModelState.Values
+                                                  .SelectMany(v => v.Errors)
+                                                  .Select(e => e.ErrorMessage));
+                return RedirectToAction("Profile");
+            }
+
+            var account = HttpContext.Session.GetInt32("UserId");
+            if (account == null)
+            {
+                TempData["PasswordError"] = "Session expired. Please log in again.";
+                return RedirectToAction("Login", "Auth");
+            }
+
+            var result = _accountService.ChangePassword(account.Value, model.CurrentPassword, model.NewPassword, out string errorMessage);
+            if (!result)
+            {
+                TempData["PasswordError"] = errorMessage;
+                return RedirectToAction("Profile");
+            }
+
+            TempData["PasswordSuccess"] = "Password changed successfully.";
+            return RedirectToAction("Profile");
+        }
+    }
 }
 
