@@ -1,32 +1,86 @@
 ﻿@using System.Text.Json
 @model List<NewsArticleSummaryViewModel>
 
-<h2>My News Article</h2>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Created Date</th>
-            <th>Category</th>
-            <th>Status</th>
-            <th>Modified Date</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.NewsTitle</td>
-                <td>@item.CreatedDate?.ToString("yyyy-MM-dd")</td>
-                <td>@item.CategoryName</td>
-                <td>@(item.NewsStatus == true ? "Active" : "Inactive")</td>
-                <td>@item.ModifiedDate?.ToString("yyyy-MM-dd")</td>
-                <td>
-                    <a asp-action="Detail" asp-route-id="@item.NewsArticleId" class="btn btn-sm btn-primary">Detail</a>
-                </td>
-            </tr>
+<style>
+    .article-list-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 10px 15px;
+    }
+
+    .article-card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: box-shadow 0.3s ease;
+    }
+
+        .article-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
-    </tbody>
-</table>
-    
+
+    .article-title {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #1a1a1a;
+    }
+
+    .article-meta {
+        font-size: 0.9rem;
+        color: #777;
+        margin-bottom: 10px;
+    }
+
+    .article-status {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #fff;
+        background-color: #28a745;
+        padding: 4px 10px;
+        border-radius: 20px;
+        display: inline-block;
+    }
+
+        .article-status.inactive {
+            background-color: #dc3545;
+        }
+
+    .article-actions {
+        margin-top: 15px;
+    }
+
+        .article-actions a.btn {
+            padding: 6px 14px;
+            font-size: 0.9rem;
+        }
+</style>
+
+<div class="article-list-container">
+    <h2 class="mb-4">My News Articles</h2>
+
+    @foreach (var item in Model)
+    {
+        <div class="article-card">
+            <div class="article-title">@item.NewsTitle</div>
+
+            <div class="article-meta">M
+                <p><strong>Created:</strong> @item.CreatedDate?.ToString("yyyy-MM-dd")</p>
+                <p><strong>Modified:</strong> @item.ModifiedDate?.ToString("yyyy-M-dd")</p>
+                <p><strong>Category:</strong> @item.CategoryName</p>
+                <p>
+                    <strong>Status:</strong>
+                    <span class="article-status @(item.NewsStatus == true ? "" : "inactive")">
+                        @(item.NewsStatus == true ? "Active" : "Inactive")
+                    </span>
+                </p>
+            </div>
+
+            <div class="article-actions">
+                <a asp-action="Detail" asp-route-id="@item.NewsArticleId" class="btn btn-primary">View Detail</a>
+            </div>
+        </div>
+    }
+</div>
