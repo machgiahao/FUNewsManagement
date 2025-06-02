@@ -233,36 +233,5 @@ namespace NewsManagementMVC.Controllers
 
             return View(newsListViewModels);
         }
-
-        public IActionResult Detail(string id)
-        {
-            if (string.IsNullOrEmpty(id))
-            {
-                return BadRequest();
-            }
-
-            var newsArticle = _contextNewsArticle.GetDetailNewsArticleById(id);
-            if (newsArticle == null)
-            {
-                return NotFound();
-            }
-
-            var viewModel = new NewsArticleDetailViewModel
-            {
-                NewsTitle = newsArticle.NewsTitle,
-                Headline = newsArticle.Headline,
-                CreatedDate = newsArticle.CreatedDate,
-                NewsContent = newsArticle.NewsContent,
-                NewsSource = newsArticle.NewsSource,
-                CategoryName = newsArticle.Category?.CategoryName,
-                NewsStatus = newsArticle.NewsStatus,
-                CreatedName = newsArticle.CreatedBy?.AccountName ?? "Unknown",
-                UpdatedName = newsArticle.UpdatedBy?.AccountName ?? "Unknown",
-                ModifiedDate = newsArticle.ModifiedDate,
-                TagNames = newsArticle.Tags?.Select(t => t.TagName).ToList() ?? new List<string>()
-            };
-
-            return View("MyDetailNewsArticle", viewModel);
-        }
     }
 }

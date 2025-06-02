@@ -10,9 +10,11 @@ using FUNewsManagementSystem.Services;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Microsoft.AspNetCore.Authorization;
 using FUNewsManagementSystem.BusinessObject.Enums;
+using NewsManagementMVC.Attributes;
 
 namespace NewsManagementMVC.Controllers
 {
+    [CustomAuthorize(AccountRole.Staff)]
     public class CategoriesController : Controller
     {
         private readonly ICategoryService _categoryService;
@@ -23,13 +25,9 @@ namespace NewsManagementMVC.Controllers
         }
 
         // GET: Categories
+        //[CustomAuthorize(AccountRole.Staff)]
         public IActionResult Index(string search)
         {
-            var role = HttpContext.Session.GetInt32("Role");
-            if (role != 1)
-            {
-                return NotFound();
-            }
 
             ViewData["ShowSearch"] = true;
 
@@ -46,6 +44,7 @@ namespace NewsManagementMVC.Controllers
         }
 
         // GET: Categories/Details
+        //[CustomAuthorize(AccountRole.Staff)]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)

@@ -33,6 +33,11 @@
 
 
 </p>
+<!-- Center: Search Bar -->
+@if (ViewData["ShowSearch"] as bool? == true)
+{
+    @await Html.PartialAsync("_SearchBar", Context.Request.Query["search"].ToString())
+}
 
 <table class="table">
     <thead>

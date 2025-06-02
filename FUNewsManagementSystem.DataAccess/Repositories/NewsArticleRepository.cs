@@ -130,7 +130,9 @@ namespace FUNewsManagementSystem.DataAccess
             // Example using Entity Framework
             var article = context.NewsArticles
                 .Include(n => n.Category)
+                .Include(n => n.Tags)
                 .Include(n => n.CreatedBy)
+                .Include(n => n.UpdatedBy)
                 .FirstOrDefault(n => n.NewsArticleId == newsArticleId);
             return article;
         }
@@ -159,17 +161,6 @@ namespace FUNewsManagementSystem.DataAccess
                 .Include(n => n.Category)
                 .Where(n => n.CreatedById == creatorId)
                 .ToList();
-        }
-
-        public NewsArticle GetDetailNewsArticleById(string newsArticleId)
-        {
-            using var context = new FunewsManagementContext();
-            return context.NewsArticles
-                .Include(n => n.Category)
-                .Include(n => n.Tags)
-                .Include(n => n.CreatedBy)
-                .Include(n => n.UpdatedBy)
-                .FirstOrDefault(n => n.NewsArticleId == newsArticleId);
         }
     }
 }

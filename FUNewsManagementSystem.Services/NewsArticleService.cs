@@ -92,10 +92,5 @@ namespace FUNewsManagementSystem.Services
         {
             return _iNewsArticleRepository.GetListNewsArticlesByCreator(creatorId);
         }
-
-        public NewsArticle GetDetailNewsArticleById(string newArticleId)
-        {
-            return _iNewsArticleRepository.GetDetailNewsArticleById(newArticleId);
-        }
     }
 }

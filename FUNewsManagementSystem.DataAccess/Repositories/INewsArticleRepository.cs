@@ -16,6 +16,5 @@ namespace FUNewsManagementSystem.DataAccess
         NewsArticle GetNewsArticleById(string newsArticleId);
         List<NewsArticle> GetNewsArticlesByPeriod(DateTime startDate, DateTime endDate);
         List<NewsArticle> GetListNewsArticlesByCreator(int userId);
-        NewsArticle GetDetailNewsArticleById(string newsArticleId);
     }
 }

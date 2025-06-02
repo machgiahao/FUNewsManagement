@@ -86,5 +86,5 @@
         <dd>@(Model.CreatedBy != null ? Model.CreatedBy.AccountName : "N/A")</dd>
 
     </dl>
-    <a asp-action="Index" class="back-link">← Back to List</a>
+    <a href="#" onclick="if(document.referrer){window.history.back();}else{window.location='@Url.Action("Index")';} return false;" class="back-link">← Back</a>
 </div>
