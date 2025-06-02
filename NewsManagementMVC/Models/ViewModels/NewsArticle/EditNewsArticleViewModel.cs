@@ -41,7 +41,7 @@ namespace NewsManagementMVC.Models.ViewModels.NewsArticle
                 NewsContent = this.NewsContent,
                 NewsSource = this.NewsSource,
                 CategoryId = this.CategoryId,
-                NewsStatus = this.NewsStatus ?? false,
+                NewsStatus = this.NewsStatus,
                 UpdatedById = id,
                 Tags = this.SelectedTagIds.Select(tagId => new Tag { TagId = tagId }).ToList()
             };

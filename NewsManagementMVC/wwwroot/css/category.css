@@ -38,3 +38,26 @@
     background: #fff3e0;
     transition: background 0.2s;
 }
+
+.details-badge {
+    font-size: 1em;
+    padding: 0.3em 1em;
+    border-radius: 12px;
+    font-weight: 600;
+    background: #e8f5e9;
+    color: #388e3c;
+    display: inline-block;
+}
+
+.details-badge.inactive {
+    background: #ffebee;
+    color: #d32f2f;
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}

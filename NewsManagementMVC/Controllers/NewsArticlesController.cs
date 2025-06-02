@@ -38,9 +38,9 @@ namespace NewsManagementMVC.Controllers
                 .Select(EditNewsArticleViewModel.FromNewsArticle)
                 .ToDictionary(m => m.NewsArticleId);
 
-            ViewBag.Role = role;
             ViewData["CategoryId"] = new SelectList(_contextCategory.GetCategories(), "CategoryId", "CategoryName");
             ViewData["TagIds"] = new MultiSelectList(_contextTag.GetTags(), "TagId", "TagName");
+            ViewBag.Role = role;
             ViewBag.EditModels = editModels;
 
             if (role == (int)AccountRole.Staff || role == (int)AccountRole.Admin)
@@ -211,6 +211,7 @@ namespace NewsManagementMVC.Controllers
             return View(reportData);
         }
 
+        [CustomAuthorize(AccountRole.Staff)]
         public IActionResult MyNewsArticle()
         {
             var userId = HttpContext.Session.GetInt32("UserId");
