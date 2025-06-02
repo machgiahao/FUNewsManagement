@@ -5,18 +5,29 @@
 
 <h2>News Report</h2>
 
+@* <form method="get"> *@
+@*     <label>Start Date:  *@
+@*         <input type="date" name="startDate"  *@
+@*                value="@(ViewData["StartDate"] is DateTime start ? start.ToString("yyyy-MM-dd") : "")" /> *@
+@*     </label> *@
+@*     <label>End Date:  *@
+@*         <input type="date" name="endDate"  *@
+@*                value="@(ViewData["EndDate"] is DateTime end ? end.ToString("yyyy-MM-dd") : "")" /> *@
+@*     </label> *@
+@*     <button type="submit">Generate Report</button> *@
+@* </form> *@
+<link href="/css/report.css" rel="stylesheet"/>
 <form method="get">
-    <label>Start Date: 
-        <input type="date" name="startDate" 
-               value="@(ViewData["StartDate"] is DateTime start ? start.ToString("yyyy-MM-dd") : "")" />
-    </label>
-    <label>End Date: 
-        <input type="date" name="endDate" 
-               value="@(ViewData["EndDate"] is DateTime end ? end.ToString("yyyy-MM-dd") : "")" />
-    </label>
-    <button type="submit">Generate Report</button>
+    <div class="report-filter-bar">
+        <label for="startDate">Start Date:</label>
+        <input type="date" id="startDate" name="startDate" value="@ViewBag.StartDate" class="form-control" />
+        <label for="endDate" style="margin-left:12px;">End Date:</label>
+        <input type="date" id="endDate" name="endDate" value="@ViewBag.EndDate" class="form-control" />
+        <button type="submit" class="btn btn-primary ms-3">
+            <i class="bi bi-file-earmark-bar-graph"></i> Generate Report
+        </button>
+    </div>
 </form>
-
 @if (Model != null && Model.Count > 0)
 {
     <table class="table">
