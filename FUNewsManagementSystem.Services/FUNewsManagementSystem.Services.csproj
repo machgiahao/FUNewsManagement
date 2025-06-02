@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FUNewsManagementSystem.BusinessObject\FUNewsManagementSystem.BusinessObject.csproj" />
     <ProjectReference Include="..\FUNewsManagementSystem.DataAccess\FUNewsManagementSystem.DataAccess.csproj" />
   </ItemGroup>
 
